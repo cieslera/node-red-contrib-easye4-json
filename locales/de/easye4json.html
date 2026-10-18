@@ -11,7 +11,10 @@
             dann den Haken <b>nicht</b> setzen.</dd>
         <dt>Anmeldung</dt><dd><b>Benutzer + Passwort</b> (z. B. <code>admin</code> oder ein in easySoft 7/8 angelegter Benutzer),
             <b>API-Schlüssel</b> (ab Firmware 1.11) oder <b>ohne Anmeldung</b> (Gast, nur Lesen und nur wenn freigegeben).
-            Zugangsdaten werden von Node-RED verschlüsselt gespeichert und nicht mit exportiert.</dd>
+            Zugangsdaten werden von Node-RED verschlüsselt gespeichert und nicht mit exportiert.
+            <br>Einen API-Schlüssel kann der <code>admin</code> im Web-Client der easyE4 nur für die anderen Benutzer
+            anlegen, nicht für sich selbst. Der Schlüssel hat die Rechte seines Benutzers. Für Admin-Befehle wie das
+            Ändern des Gerätenamens <b>Benutzer + Passwort</b> als <code>admin</code> verwenden.</dd>
         <dt>Lesen über</dt><dd><i>automatisch</i>: Benutzer <code>admin</code> liest über <code>/api/get/adm</code>, alle anderen über
             <code>/api/get/data</code>. Nur ändern, wenn nötig (E-Mail-Einstellungen gibt es nur über <code>adm</code>).</dd>
         <dt>Zeitlimit</dt><dd>So lange wird auf eine Antwort gewartet (Standard 3000 ms).</dd>
@@ -25,7 +28,7 @@
         <li>Lesen geht für alle Benutzer; Ein-/Ausgänge nur mit <i>Enable read I/O</i>.</li>
         <li>Merker schreiben: Benutzer mit Recht „lesen und schreiben“ und freigegebenem Merkerbereich.</li>
         <li>RUN/STOP bzw. Uhr stellen: Schreibrecht für <i>mode</i> bzw. <i>clock</i>.</li>
-        <li>Gerätename ändern: nur <code>admin</code>.</li>
+        <li>Gerätename ändern: nur <code>admin</code> (mit Benutzer + Passwort, nicht mit API-Schlüssel).</li>
     </ul>
     <h3>Schutz vor Überlastung</h3>
     <ul>

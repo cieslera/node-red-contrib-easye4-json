@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.1
+
+- Help and README: API keys can only be created for users other than `admin`; admin commands (e.g. changing the
+  device name) need user + password as `admin`. Also tested on an easyE4 with firmware 2.46.
+  / Hilfe und README: API-Schlüssel gibt es nur für andere Benutzer als `admin`; Admin-Befehle (z. B. Gerätename
+  ändern) brauchen Benutzer + Passwort als `admin`. Zusätzlich an einer easyE4 mit Firmware 2.46 getestet.
+
 ## 1.1.0
 
 - First public release (npm, GitHub, Node-RED library). Tested on a real easyE4 with firmware 1.44 (https, user +

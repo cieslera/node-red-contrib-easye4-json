@@ -52,6 +52,8 @@ Project → web server: *Web server enabled* (*Always enabled*), *Enable read I/
 *Anonymous read access allowed* for reading without login. For writing, a user with write permission and an enabled
 marker range is needed (RUN/STOP: permission *mode*, clock: permission *clock*). API keys need firmware 1.11 or later,
 function blocks firmware 1.20 or later.
+API keys are created by `admin` in the web client of the easyE4, but only for the other users, not for `admin` itself.
+A key has the permissions of its user. For admin commands (e.g. changing the device name) use user + password as `admin`.
 easySoft 8 can also program devices with firmware 1.x: choose that firmware in the device selection
 (latest: 1.44 for devices below series 08).
 
@@ -97,6 +99,9 @@ Projekt → Webserver: *Web server enabled* (*Always enabled*), für Ein-/Ausgä
 Anmeldung *Anonymous read access allowed*. Zum Schreiben einen Benutzer mit Schreibrecht und freigegebenem
 Merkerbereich anlegen (RUN/STOP: Recht *mode*, Uhr: Recht *clock*). API-Schlüssel ab Firmware 1.11,
 Funktionsbausteine ab Firmware 1.20.
+API-Schlüssel legt der `admin` im Web-Client der easyE4 an, aber nur für die anderen Benutzer, nicht für sich selbst.
+Ein Schlüssel hat die Rechte seines Benutzers. Für Admin-Befehle (z. B. Gerätename ändern) Benutzer + Passwort als
+`admin` verwenden.
 Auch easySoft 8 kann Geräte mit Firmware 1.x programmieren: In der Geräteauswahl diese Firmware wählen
 (aktuell 1.44 für Geräte unterhalb der Baureihe 08).
 

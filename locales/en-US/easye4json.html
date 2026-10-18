@@ -11,7 +11,10 @@
             this <b>unchecked</b>.</dd>
         <dt>Login</dt><dd><b>User + password</b> (e.g. <code>admin</code> or a user created in easySoft 7/8),
             <b>API key</b> (firmware 1.11 or later) or <b>no login</b> (guest, read only and only if enabled).
-            Credentials are stored encrypted by Node-RED and are not exported.</dd>
+            Credentials are stored encrypted by Node-RED and are not exported.
+            <br>In the web client of the easyE4, <code>admin</code> can create API keys only for the other users, not
+            for itself. A key has the permissions of its user. For admin commands such as changing the device name,
+            use <b>user + password</b> as <code>admin</code>.</dd>
         <dt>Read via</dt><dd><i>automatic</i>: user <code>admin</code> reads via <code>/api/get/adm</code>, all others via
             <code>/api/get/data</code>. Only change if needed (e-mail settings are only available via <code>adm</code>).</dd>
         <dt>Timeout</dt><dd>How long to wait for an answer (default 3000 ms).</dd>
@@ -24,7 +27,7 @@
         <li>Reading works for all users; inputs/outputs only with <i>Enable read I/O</i>.</li>
         <li>Writing markers: user with "read and write" permission and an enabled marker range.</li>
         <li>RUN/STOP or setting the clock: write permission for <i>mode</i> or <i>clock</i>.</li>
-        <li>Changing the device name: <code>admin</code> only.</li>
+        <li>Changing the device name: <code>admin</code> only (with user + password, not with an API key).</li>
     </ul>
     <h3>Overload protection</h3>
     <ul>
