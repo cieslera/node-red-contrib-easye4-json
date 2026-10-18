@@ -2,7 +2,7 @@
    easyE4 JSON-API Demo  -  ST-Programm zum Node-RED-Beispiel
    "easye4json-beispiel" aus node-red-contrib-easye4-json
 
-   Fuer aeltere easyE4 (Firmware 1.x, empfohlen 1.44) mit Webserver.
+   Fuer easyE4 mit Webserver (aktuelle Geraete und Firmware 1.x, dort empfohlen 1.44).
    Funktionsbausteine ueber die JSON-API erst ab Firmware 1.20.
 
    Funktion:

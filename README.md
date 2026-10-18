@@ -2,13 +2,15 @@
 
 **[English](#english) | [Deutsch](#deutsch)**
 
-Node-RED nodes for **older Eaton easyE4** controllers via the **JSON API** of their web server (HTTP/HTTPS).
-For easyE4 devices with MQTT (firmware 2.40 or later) use
-[node-red-contrib-easye4-mqtt](https://flows.nodered.org/node/node-red-contrib-easye4-mqtt) instead.
+Node-RED nodes for the **Eaton easyE4** via the **JSON API** of its web server (HTTP/HTTPS).
+Works with current devices as well as with devices of earlier series (firmware 1.x) that have no MQTT.
+For communication via MQTT (firmware 2.40 or later) there is also
+[node-red-contrib-easye4-mqtt](https://flows.nodered.org/node/node-red-contrib-easye4-mqtt).
 Both packages can be installed side by side.
 
-Node-RED-Knoten für **ältere Eaton easyE4** über die **JSON-API** des Webservers (HTTP/HTTPS).
-Für easyE4 mit MQTT (Firmware ab 2.40) gibt es
+Node-RED-Knoten für die **Eaton easyE4** über die **JSON-API** des Webservers (HTTP/HTTPS).
+Funktioniert mit aktuellen Geräten ebenso wie mit Geräten früherer Baureihen (Firmware 1.x) ohne MQTT.
+Für die Anbindung über MQTT (Firmware ab 2.40) gibt es zusätzlich
 [node-red-contrib-easye4-mqtt](https://flows.nodered.org/node/node-red-contrib-easye4-mqtt).
 Beide Pakete können gleichzeitig installiert sein.
 
@@ -50,7 +52,7 @@ Project → web server: *Web server enabled* (*Always enabled*), *Enable read I/
 *Anonymous read access allowed* for reading without login. For writing, a user with write permission and an enabled
 marker range is needed (RUN/STOP: permission *mode*, clock: permission *clock*). API keys need firmware 1.11 or later,
 function blocks firmware 1.20 or later.
-easySoft 8 can also program the older devices: choose the old firmware in the device selection
+easySoft 8 can also program devices with firmware 1.x: choose that firmware in the device selection
 (latest: 1.44 for devices below series 08).
 
 ### Good to know
@@ -95,7 +97,7 @@ Projekt → Webserver: *Web server enabled* (*Always enabled*), für Ein-/Ausgä
 Anmeldung *Anonymous read access allowed*. Zum Schreiben einen Benutzer mit Schreibrecht und freigegebenem
 Merkerbereich anlegen (RUN/STOP: Recht *mode*, Uhr: Recht *clock*). API-Schlüssel ab Firmware 1.11,
 Funktionsbausteine ab Firmware 1.20.
-Auch easySoft 8 kann die älteren Geräte programmieren: In der Geräteauswahl die alte Firmware wählen
+Auch easySoft 8 kann Geräte mit Firmware 1.x programmieren: In der Geräteauswahl diese Firmware wählen
 (aktuell 1.44 für Geräte unterhalb der Baureihe 08).
 
 ### Gut zu wissen
