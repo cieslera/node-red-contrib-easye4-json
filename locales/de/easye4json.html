@@ -1,0 +1,133 @@
+<script type="text/html" data-help-name="easye4json-device">
+    <p>Eine easyE4 mit Webserver, angesprochen über die <b>JSON-API</b> (für ältere Geräte bzw. Firmware ohne MQTT).
+        Die Knoten <i>easyE4 JSON lesen</i>, <i>schreiben</i> und <i>aktion</i> verweisen auf diesen Eintrag.
+        Pro easyE4 genügt ein Eintrag; alle Anfragen an dieses Gerät laufen nacheinander über eine Verbindung.</p>
+    <h3>Einstellungen</h3>
+    <dl class="message-properties">
+        <dt>Adresse</dt><dd>IP-Adresse oder Name der easyE4, z. B. <code>192.168.178.50</code>.</dd>
+        <dt>Protokoll / Port</dt><dd><code>http</code> (Port 80) oder <code>https</code> (Port 443), so wie der Webserver in
+            easySoft 7/8 eingestellt ist. Port leer lassen = Standard.</dd>
+        <dt>Zertifikat prüfen</dt><dd>Nur bei https. Die easyE4 verwendet normalerweise ein selbst ausgestelltes Zertifikat;
+            dann den Haken <b>nicht</b> setzen.</dd>
+        <dt>Anmeldung</dt><dd><b>Benutzer + Passwort</b> (z. B. <code>admin</code> oder ein in easySoft 7/8 angelegter Benutzer),
+            <b>API-Schlüssel</b> (ab Firmware 1.11) oder <b>ohne Anmeldung</b> (Gast, nur Lesen und nur wenn freigegeben).
+            Zugangsdaten werden von Node-RED verschlüsselt gespeichert und nicht mit exportiert.</dd>
+        <dt>Lesen über</dt><dd><i>automatisch</i>: Benutzer <code>admin</code> liest über <code>/api/get/adm</code>, alle anderen über
+            <code>/api/get/data</code>. Nur ändern, wenn nötig (E-Mail-Einstellungen gibt es nur über <code>adm</code>).</dd>
+        <dt>Zeitlimit</dt><dd>So lange wird auf eine Antwort gewartet (Standard 3000 ms).</dd>
+        <dt>Pause</dt><dd>Mindestabstand zwischen zwei Anfragen (Standard 50 ms), damit der Webserver der easyE4 nicht
+            überlastet wird. Bei Problemen vergrößern (z. B. 200).</dd>
+    </dl>
+    <p>Mit <b>Verbindung testen</b> liest der Dialog Gerätename, Firmware und Betriebsart, ohne dass du vorher
+        übernehmen musst.</p>
+    <h3>Rechte (easySoft 7/8)</h3>
+    <ul>
+        <li>Lesen geht für alle Benutzer; Ein-/Ausgänge nur mit <i>Enable read I/O</i>.</li>
+        <li>Merker schreiben: Benutzer mit Recht „lesen und schreiben“ und freigegebenem Merkerbereich.</li>
+        <li>RUN/STOP bzw. Uhr stellen: Schreibrecht für <i>mode</i> bzw. <i>clock</i>.</li>
+        <li>Gerätename ändern: nur <code>admin</code>.</li>
+    </ul>
+    <h3>Schutz vor Überlastung</h3>
+    <ul>
+        <li>An dieselbe easyE4 geht immer nur <b>eine Anfrage gleichzeitig</b> über eine Verbindung – auch wenn mehrere
+            Steuerungs-Einträge dieselbe Adresse haben.</li>
+        <li>Zwischen zwei Anfragen liegt mindestens die eingestellte <i>Pause</i>.</li>
+        <li>Ist die easyE4 nicht erreichbar, wird immer seltener nachgefragt (1 s, 2 s, 4 s … höchstens 10 s).</li>
+        <li>Kommen viele Schreibbefehle für denselben Operanden schnell hintereinander (z. B. Schieberegler), wird nur
+            der neueste Wert gesendet.</li>
+        <li>Ein Lese-Knoten fragt erst wieder an, wenn seine vorige Antwort da ist.</li>
+    </ul>
+    <h3>Statusanzeige</h3>
+    <p>Die Knoten zeigen ihren letzten Wert (grün), einen Fehler (rot), „easyE4 nicht erreichbar“ oder
+        „Anmeldung abgelehnt“.</p>
+    <h3>Haftungsausschluss</h3>
+    <p>Inoffizielles Projekt, nicht von Eaton. Benutzung auf eigene Gefahr, ohne jegliche Haftung. Details: <code>LICENSE</code> (MIT).</p>
+</script>
+
+<script type="text/html" data-help-name="easye4json-read">
+    <p>Liest Werte aus der easyE4 über die JSON-API. Der Knoten fragt selbst ab: alle <i>x</i> Sekunden und/oder
+        bei jeder eingehenden Nachricht.</p>
+    <h3>Was lesen</h3>
+    <dl class="message-properties">
+        <dt>Einen Operanden</dt><dd>Typ und Nummer, z. B. <code>MW</code> <code>3</code>. Bei NET-Merkern zusätzlich die NET-ID
+            (0 = dieses Gerät, 1–8 = Teilnehmer im NET).</dd>
+        <dt>Bereich</dt><dd>z. B. <code>MW1</code> bis <code>MW8</code> → <code>{MW1: …, …, MW8: …}</code>. Bei Bit-Operanden
+            (I, Q, M, N, ID) fragt der Knoten automatisch ganze Bytes ab (z. B. I3–I6 als I1–I8), wie es die easyE4
+            verlangt, und gibt nur die gewünschten aus.</dd>
+        <dt>Alle</dt><dd>Alle I, Q, AI, AO oder M als Objekt.</dd>
+        <dt>Systeminformation</dt><dd>Betriebsart (<code>RUN</code>/<code>STOP</code>), Firmware, Datum, Uhrzeit,
+            Zykluszeit, Diagnose …</dd>
+        <dt>Funktionsbaustein-Anschluss</dt><dd>Baustein (z. B. <code>T</code>), Nummer (<code>1</code>), Anschluss-Art
+            (0 Bit-Eingang, 1 Bit-Ausgang, 2 Wort-Eingang, 3 Wort-Ausgang) und Anschluss-Nr. (von oben gezählt ab 0).
+            Beispiel Zeitrelais T1: <code>(1;0)</code> = Q1, <code>(2;0)</code> = I1, <code>(3;0)</code> = QV.
+            Ab Firmware 1.20.</dd>
+        <dt>Mehrere (Liste)</dt><dd>Beliebig gemischt, getrennt durch Komma, z. B.
+            <code>M1, MW3, Q(1,4), N(2;5), STATE, T1(2;0)</code>. Alles wird mit möglichst wenigen Anfragen geholt.</dd>
+        <dt>Aus der Nachricht</dt><dd>Dasselbe als Text in <code>msg.topic</code> oder <code>msg.payload</code>.</dd>
+    </dl>
+    <h3>Ausgang</h3>
+    <dl class="message-properties">
+        <dt>payload</dt><dd>Bei einem Wert die Zahl (Bits als 0/1), sonst ein Objekt <code>{M1: 1, MW3: 42, STATE: "RUN"}</code>.
+            Zeiten von Bausteinen in Millisekunden, die Einzelteile stehen in <code>msg.time</code>.</dd>
+        <dt>topic</dt><dd>Name des Operanden (z. B. <code>MW3</code>, NET-Merker als <code>N(2;5)</code>, Ausgänge als <code>Q1</code>).</dd>
+        <dt>raw</dt><dd>Die unveränderte Antwort der easyE4.</dd>
+    </dl>
+    <h3>Hinweise</h3>
+    <ul>
+        <li>Das kürzeste Abfrageintervall ist 0,5 s. Die easyE4 beantwortet je nach Gerät nur einige Anfragen pro
+            Sekunde; alle Knoten teilen sich diese. Viele Werte daher besser in <b>einem</b> Knoten mit <i>Liste</i>
+            lesen (eine Anfrage statt vieler) und nur so oft abfragen wie nötig.</li>
+        <li>Läuft eine Abfrage noch, wird die nächste automatische übersprungen.</li>
+        <li>Fehler (z. B. falsche Nummer) erscheinen rot unter dem Knoten und können mit einem <i>catch</i>-Knoten
+            abgefangen werden.</li>
+    </ul>
+</script>
+
+
+<script type="text/html" data-help-name="easye4json-write">
+    <p>Schreibt einen Wert in die easyE4 über die JSON-API.</p>
+    <h3>Eingang</h3>
+    <dl class="message-properties">
+        <dt>payload <span class="property-type">Zahl | boolean | Objekt</span></dt>
+        <dd>Der Wert, z. B. <code>42</code> oder <code>true</code> (= 1). Bei <i>Aus der Nachricht</i> auch mehrere auf einmal:
+            <code>{M5: 1, MW3: 42, "N(1;7)": 0, "T1(2;0)": 2000}</code>.</dd>
+        <dt class="optional">topic</dt><dd>Bei <i>Aus der Nachricht</i>: das Ziel, z. B. <code>MW3</code>.</dd>
+    </dl>
+    <h3>Was ist beschreibbar</h3>
+    <ul>
+        <li>Merker <code>M</code> (0/1), <code>MB</code> (0–255), <code>MW</code>, <code>MD</code> und NET-Merker
+            <code>N</code>, <code>NB</code>, <code>NW</code>, <code>ND</code> (mit NET-ID 0–8).</li>
+        <li>Eingänge von Funktionsbausteinen (ab Firmware 1.20, nur in RUN): Bit-Eingänge (Art 0) dürfen im Programm
+            nicht verbunden sein; Wort-Eingänge (Art 2) müssen mit einer Konstanten verbunden sein.
+            Zeiten immer in Millisekunden (10 h 20 min = <code>37200000</code>). Die Änderung gilt bis zum Neustart;
+            dauerhaft mit der Aktion <i>Baustein-Änderungen speichern</i>.</li>
+        <li>Nicht beschreibbar: I, Q, AI, AO, ID.</li>
+    </ul>
+    <h3>Ausgang</h3>
+    <p>Die Eingangsnachricht mit <code>msg.success = true</code> und <code>msg.results</code> (Antworten der easyE4).
+        Fehler gehen an einen <i>catch</i>-Knoten.</p>
+    <p>Kommen mehrere Werte für denselben Operanden, bevor der vorige gesendet wurde, wird nur der neueste gesendet
+        (alle Nachrichten werden trotzdem bestätigt).</p>
+</script>
+
+<script type="text/html" data-help-name="easye4json-action">
+    <p>Führt eine Aktion auf der easyE4 aus, sobald eine Nachricht ankommt.</p>
+    <h3>Aktionen</h3>
+    <dl class="message-properties">
+        <dt>RUN starten / STOP</dt><dd>Betriebsart umschalten.</dd>
+        <dt>Datum + Uhrzeit stellen</dt><dd>Ohne <code>msg.payload</code> die aktuelle Zeit des Node-RED-Rechners,
+            sonst ein Zeitstempel oder Text wie <code>"2026-10-18 12:00:00"</code>. <b>Nur in STOP.</b></dd>
+        <dt>Gerätename ändern</dt><dd>Name aus dem Feld oder aus <code>msg.payload</code>. <b>Nur in STOP</b>, nur als <code>admin</code>.</dd>
+        <dt>Baustein-Änderungen speichern</dt><dd>Über die JSON-API geänderte Konstanten bleiben nach einem Neustart erhalten.</dd>
+        <dt>Freie Anfrage</dt><dd><code>msg.payload</code> = API-Adresse, z. B. <code>/api/get/data?elm=CYC</code>.</dd>
+        <dt>Aus der Nachricht</dt><dd><code>msg.action</code> = <code>run</code>, <code>stop</code>, <code>setClock</code>,
+            <code>setDate</code>, <code>setTime</code>, <code>setName</code>, <code>saveFB</code> oder <code>request</code>.</dd>
+    </dl>
+    <h3>Ausgang</h3>
+    <dl class="message-properties">
+        <dt>success</dt><dd><code>true</code> oder <code>false</code>.</dd>
+        <dt>payload</dt><dd>Antwort der easyE4 (meist leer).</dd>
+        <dt>errorMsg / statusCode</dt><dd>Bei Fehlern, z. B. 403 = in diesem Zustand nicht erlaubt.</dd>
+    </dl>
+    <p>Die Nachricht wird auch bei Fehlern ausgegeben, damit der Flow reagieren kann.</p>
+</script>

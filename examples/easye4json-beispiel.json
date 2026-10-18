@@ -1,0 +1,1596 @@
+[
+  {
+    "id": "t",
+    "type": "tab",
+    "label": "easyE4 JSON Beispiel",
+    "info": "Beispiel für node-red-contrib-easye4-json – alle Funktionen.\n\n1. Doppelklick auf einen easyE4-Knoten, beim Feld *Steuerung* auf den Stift klicken.\n2. IP-Adresse und Anmeldung (Benutzer + Passwort oder API-Schlüssel) eintragen, *Verbindung testen*, *Aktualisieren*.\n3. *Übernahme (deploy)*, dann die Inject-Knoten (Kästchen links) anklicken. Ergebnisse im Debug-Fenster.\n\nPassendes easyE4-Programm (ST): easye4json-beispiel.st im Paketordner examples.\n\nAchtung: Die Aktionen STOP/RUN und das Schreiben wirken auf die echte Steuerung!"
+  },
+  {
+    "id": "dev",
+    "type": "easye4json-device",
+    "name": "easyE4",
+    "host": "",
+    "port": "",
+    "protocol": "http",
+    "verifyCert": false,
+    "auth": "basic",
+    "readPath": "auto",
+    "timeout": 3000,
+    "gap": 50
+  },
+  {
+    "id": "c1",
+    "type": "comment",
+    "z": "t",
+    "name": "1) Lesen – automatisch (Abfrageintervall)",
+    "info": "",
+    "x": 200,
+    "y": 40,
+    "wires": []
+  },
+  {
+    "opType": "MW",
+    "netId": 0,
+    "index": 3,
+    "rangeEnd": 8,
+    "allType": "I",
+    "sys": "STATE",
+    "fbName": "T",
+    "fbInst": 1,
+    "fbPinType": "1",
+    "fbPin": 0,
+    "list": "",
+    "interval": 1,
+    "onlyChange": true,
+    "mode": "operand",
+    "id": "r1",
+    "type": "easye4json-read",
+    "z": "t",
+    "name": "",
+    "device": "dev",
+    "x": 420,
+    "y": 80,
+    "wires": [
+      [
+        "dbg"
+      ]
+    ]
+  },
+  {
+    "opType": "M",
+    "netId": 0,
+    "index": 1,
+    "rangeEnd": 8,
+    "allType": "I",
+    "sys": "STATE",
+    "fbName": "T",
+    "fbInst": 1,
+    "fbPinType": "1",
+    "fbPin": 0,
+    "list": "I(1,8), Q(1,4), M1, MW3, STATE, TIME",
+    "interval": 2,
+    "onlyChange": false,
+    "mode": "list",
+    "id": "r2",
+    "type": "easye4json-read",
+    "z": "t",
+    "name": "",
+    "device": "dev",
+    "x": 420,
+    "y": 130,
+    "wires": [
+      [
+        "dbg"
+      ]
+    ]
+  },
+  {
+    "id": "c2",
+    "type": "comment",
+    "z": "t",
+    "name": "2) Lesen – auf Knopfdruck (Inject)",
+    "info": "",
+    "x": 190,
+    "y": 190,
+    "wires": []
+  },
+  {
+    "id": "ri0",
+    "type": "inject",
+    "z": "t",
+    "name": "Bereich MW3–MW10",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 170,
+    "y": 230,
+    "wires": [
+      [
+        "ri0n"
+      ]
+    ]
+  },
+  {
+    "opType": "MW",
+    "netId": 0,
+    "index": 3,
+    "rangeEnd": 10,
+    "allType": "I",
+    "sys": "STATE",
+    "fbName": "T",
+    "fbInst": 1,
+    "fbPinType": "1",
+    "fbPin": 0,
+    "list": "",
+    "interval": 0,
+    "onlyChange": false,
+    "mode": "range",
+    "id": "ri0n",
+    "type": "easye4json-read",
+    "z": "t",
+    "name": "",
+    "device": "dev",
+    "x": 420,
+    "y": 230,
+    "wires": [
+      [
+        "dbg"
+      ]
+    ]
+  },
+  {
+    "id": "ri1",
+    "type": "inject",
+    "z": "t",
+    "name": "Alle Eingänge I",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 170,
+    "y": 275,
+    "wires": [
+      [
+        "ri1n"
+      ]
+    ]
+  },
+  {
+    "opType": "M",
+    "netId": 0,
+    "index": 1,
+    "rangeEnd": 8,
+    "allType": "I",
+    "sys": "STATE",
+    "fbName": "T",
+    "fbInst": 1,
+    "fbPinType": "1",
+    "fbPin": 0,
+    "list": "",
+    "interval": 0,
+    "onlyChange": false,
+    "mode": "all",
+    "id": "ri1n",
+    "type": "easye4json-read",
+    "z": "t",
+    "name": "",
+    "device": "dev",
+    "x": 420,
+    "y": 275,
+    "wires": [
+      [
+        "dbg"
+      ]
+    ]
+  },
+  {
+    "id": "ri2",
+    "type": "inject",
+    "z": "t",
+    "name": "Alle Analogeingänge",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 170,
+    "y": 320,
+    "wires": [
+      [
+        "ri2n"
+      ]
+    ]
+  },
+  {
+    "opType": "M",
+    "netId": 0,
+    "index": 1,
+    "rangeEnd": 8,
+    "allType": "AI",
+    "sys": "STATE",
+    "fbName": "T",
+    "fbInst": 1,
+    "fbPinType": "1",
+    "fbPin": 0,
+    "list": "",
+    "interval": 0,
+    "onlyChange": false,
+    "mode": "all",
+    "id": "ri2n",
+    "type": "easye4json-read",
+    "z": "t",
+    "name": "",
+    "device": "dev",
+    "x": 420,
+    "y": 320,
+    "wires": [
+      [
+        "dbg"
+      ]
+    ]
+  },
+  {
+    "id": "ri3",
+    "type": "inject",
+    "z": "t",
+    "name": "NET-Merker N(0;1..8)",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 170,
+    "y": 365,
+    "wires": [
+      [
+        "ri3n"
+      ]
+    ]
+  },
+  {
+    "opType": "N",
+    "netId": 0,
+    "index": 1,
+    "rangeEnd": 8,
+    "allType": "I",
+    "sys": "STATE",
+    "fbName": "T",
+    "fbInst": 1,
+    "fbPinType": "1",
+    "fbPin": 0,
+    "list": "",
+    "interval": 0,
+    "onlyChange": false,
+    "mode": "range",
+    "id": "ri3n",
+    "type": "easye4json-read",
+    "z": "t",
+    "name": "",
+    "device": "dev",
+    "x": 420,
+    "y": 365,
+    "wires": [
+      [
+        "dbg"
+      ]
+    ]
+  },
+  {
+    "id": "ri4",
+    "type": "inject",
+    "z": "t",
+    "name": "Firmware",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 170,
+    "y": 410,
+    "wires": [
+      [
+        "ri4n"
+      ]
+    ]
+  },
+  {
+    "opType": "M",
+    "netId": 0,
+    "index": 1,
+    "rangeEnd": 8,
+    "allType": "I",
+    "sys": "VERSION",
+    "fbName": "T",
+    "fbInst": 1,
+    "fbPinType": "1",
+    "fbPin": 0,
+    "list": "",
+    "interval": 0,
+    "onlyChange": false,
+    "mode": "sys",
+    "id": "ri4n",
+    "type": "easye4json-read",
+    "z": "t",
+    "name": "",
+    "device": "dev",
+    "x": 420,
+    "y": 410,
+    "wires": [
+      [
+        "dbg"
+      ]
+    ]
+  },
+  {
+    "id": "ri5",
+    "type": "inject",
+    "z": "t",
+    "name": "Betriebsart",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 170,
+    "y": 455,
+    "wires": [
+      [
+        "ri5n"
+      ]
+    ]
+  },
+  {
+    "opType": "M",
+    "netId": 0,
+    "index": 1,
+    "rangeEnd": 8,
+    "allType": "I",
+    "sys": "STATE",
+    "fbName": "T",
+    "fbInst": 1,
+    "fbPinType": "1",
+    "fbPin": 0,
+    "list": "",
+    "interval": 0,
+    "onlyChange": false,
+    "mode": "sys",
+    "id": "ri5n",
+    "type": "easye4json-read",
+    "z": "t",
+    "name": "",
+    "device": "dev",
+    "x": 420,
+    "y": 455,
+    "wires": [
+      [
+        "dbg"
+      ]
+    ]
+  },
+  {
+    "id": "ri6",
+    "type": "inject",
+    "z": "t",
+    "name": "Zykluszeit",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 170,
+    "y": 500,
+    "wires": [
+      [
+        "ri6n"
+      ]
+    ]
+  },
+  {
+    "opType": "M",
+    "netId": 0,
+    "index": 1,
+    "rangeEnd": 8,
+    "allType": "I",
+    "sys": "CYC",
+    "fbName": "T",
+    "fbInst": 1,
+    "fbPinType": "1",
+    "fbPin": 0,
+    "list": "",
+    "interval": 0,
+    "onlyChange": false,
+    "mode": "sys",
+    "id": "ri6n",
+    "type": "easye4json-read",
+    "z": "t",
+    "name": "",
+    "device": "dev",
+    "x": 420,
+    "y": 500,
+    "wires": [
+      [
+        "dbg"
+      ]
+    ]
+  },
+  {
+    "id": "ri7",
+    "type": "inject",
+    "z": "t",
+    "name": "Diagnose",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 170,
+    "y": 545,
+    "wires": [
+      [
+        "ri7n"
+      ]
+    ]
+  },
+  {
+    "opType": "M",
+    "netId": 0,
+    "index": 1,
+    "rangeEnd": 8,
+    "allType": "I",
+    "sys": "DIAG",
+    "fbName": "T",
+    "fbInst": 1,
+    "fbPinType": "1",
+    "fbPin": 0,
+    "list": "",
+    "interval": 0,
+    "onlyChange": false,
+    "mode": "sys",
+    "id": "ri7n",
+    "type": "easye4json-read",
+    "z": "t",
+    "name": "",
+    "device": "dev",
+    "x": 420,
+    "y": 545,
+    "wires": [
+      [
+        "dbg"
+      ]
+    ]
+  },
+  {
+    "id": "rm",
+    "type": "inject",
+    "z": "t",
+    "name": "msg.topic = \"MB3, MD6, MD7, ID(1,16)\"",
+    "props": [
+      {
+        "p": "payload"
+      },
+      {
+        "p": "topic",
+        "vt": "str"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "MB3, MD6, MD7, ID(1,16)",
+    "payload": "",
+    "payloadType": "date",
+    "x": 170,
+    "y": 590,
+    "wires": [
+      [
+        "rmn"
+      ]
+    ]
+  },
+  {
+    "opType": "M",
+    "netId": 0,
+    "index": 1,
+    "rangeEnd": 8,
+    "allType": "I",
+    "sys": "STATE",
+    "fbName": "T",
+    "fbInst": 1,
+    "fbPinType": "1",
+    "fbPin": 0,
+    "list": "",
+    "interval": 0,
+    "onlyChange": false,
+    "mode": "msg",
+    "id": "rmn",
+    "type": "easye4json-read",
+    "z": "t",
+    "name": "",
+    "device": "dev",
+    "x": 480,
+    "y": 590,
+    "wires": [
+      [
+        "dbg"
+      ]
+    ]
+  },
+  {
+    "id": "c3",
+    "type": "comment",
+    "z": "t",
+    "name": "3) Funktionsbaustein T1 (Zeitrelais)",
+    "info": "Passend zum ST-Programm easye4json-beispiel.st (T01 schaltet Q02, wenn Q01 länger als die Sollzeit an ist).\n\nVoraussetzung im easySoft-Programm (ab Firmware 1.20):\n- Zeitrelais T01 ist im Programm verwendet.\n- I1 (Sollzeit) ist mit einer **Timerkonstante** belegt, in ST z. B. `I1 := T#5s_0ms` (sonst Fehler 36).\n- RE (Reset) ist im Programm **nicht** verbunden, in ST `RE := ,` (Bit-Eingänge sind nur dann beschreibbar).\n- Bausteinwerte lassen sich nur in **RUN** schreiben. Zeiten immer in Millisekunden.\n\nAnschlüsse T: (0;0)=EN, (0;1)=RE, (0;2)=ST, (1;0)=Q1, (2;0)=I1, (2;1)=I2, (3;0)=QV",
+    "x": 200,
+    "y": 650,
+    "wires": []
+  },
+  {
+    "id": "rt0",
+    "type": "inject",
+    "z": "t",
+    "name": "T1 Ausgang Q1",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 170,
+    "y": 690,
+    "wires": [
+      [
+        "rt0n"
+      ]
+    ]
+  },
+  {
+    "opType": "M",
+    "netId": 0,
+    "index": 1,
+    "rangeEnd": 8,
+    "allType": "I",
+    "sys": "STATE",
+    "fbName": "T",
+    "fbInst": 1,
+    "fbPinType": "1",
+    "fbPin": 0,
+    "list": "",
+    "interval": 0,
+    "onlyChange": false,
+    "mode": "fb",
+    "id": "rt0n",
+    "type": "easye4json-read",
+    "z": "t",
+    "name": "",
+    "device": "dev",
+    "x": 420,
+    "y": 690,
+    "wires": [
+      [
+        "dbg"
+      ]
+    ]
+  },
+  {
+    "id": "rt1",
+    "type": "inject",
+    "z": "t",
+    "name": "T1 Sollzeit I1 (ms)",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 170,
+    "y": 735,
+    "wires": [
+      [
+        "rt1n"
+      ]
+    ]
+  },
+  {
+    "opType": "M",
+    "netId": 0,
+    "index": 1,
+    "rangeEnd": 8,
+    "allType": "I",
+    "sys": "STATE",
+    "fbName": "T",
+    "fbInst": 1,
+    "fbPinType": "2",
+    "fbPin": 0,
+    "list": "",
+    "interval": 0,
+    "onlyChange": false,
+    "mode": "fb",
+    "id": "rt1n",
+    "type": "easye4json-read",
+    "z": "t",
+    "name": "",
+    "device": "dev",
+    "x": 420,
+    "y": 735,
+    "wires": [
+      [
+        "dbg"
+      ]
+    ]
+  },
+  {
+    "id": "rt2",
+    "type": "inject",
+    "z": "t",
+    "name": "T1 Istwert QV (ms)",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 170,
+    "y": 780,
+    "wires": [
+      [
+        "rt2n"
+      ]
+    ]
+  },
+  {
+    "opType": "M",
+    "netId": 0,
+    "index": 1,
+    "rangeEnd": 8,
+    "allType": "I",
+    "sys": "STATE",
+    "fbName": "T",
+    "fbInst": 1,
+    "fbPinType": "3",
+    "fbPin": 0,
+    "list": "",
+    "interval": 0,
+    "onlyChange": false,
+    "mode": "fb",
+    "id": "rt2n",
+    "type": "easye4json-read",
+    "z": "t",
+    "name": "",
+    "device": "dev",
+    "x": 420,
+    "y": 780,
+    "wires": [
+      [
+        "dbg"
+      ]
+    ]
+  },
+  {
+    "id": "wt0",
+    "type": "inject",
+    "z": "t",
+    "name": "Sollzeit I1 = 5 s",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "5000",
+    "payloadType": "num",
+    "x": 170,
+    "y": 825,
+    "wires": [
+      [
+        "wt0n"
+      ]
+    ]
+  },
+  {
+    "opType": "M",
+    "netId": 0,
+    "index": 1,
+    "fbName": "T",
+    "fbInst": 1,
+    "fbPinType": "2",
+    "fbPin": 0,
+    "mode": "fb",
+    "id": "wt0n",
+    "type": "easye4json-write",
+    "z": "t",
+    "name": "",
+    "device": "dev",
+    "x": 420,
+    "y": 825,
+    "wires": [
+      [
+        "dbg"
+      ]
+    ]
+  },
+  {
+    "id": "wt1",
+    "type": "inject",
+    "z": "t",
+    "name": "Reset RE = 1",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "1",
+    "payloadType": "num",
+    "x": 170,
+    "y": 870,
+    "wires": [
+      [
+        "wt1n"
+      ]
+    ]
+  },
+  {
+    "opType": "M",
+    "netId": 0,
+    "index": 1,
+    "fbName": "T",
+    "fbInst": 1,
+    "fbPinType": "0",
+    "fbPin": 1,
+    "mode": "fb",
+    "id": "wt1n",
+    "type": "easye4json-write",
+    "z": "t",
+    "name": "",
+    "device": "dev",
+    "x": 420,
+    "y": 870,
+    "wires": [
+      [
+        "dbg"
+      ]
+    ]
+  },
+  {
+    "id": "wt2",
+    "type": "inject",
+    "z": "t",
+    "name": "Reset RE = 0",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "0",
+    "payloadType": "num",
+    "x": 170,
+    "y": 915,
+    "wires": [
+      [
+        "wt1n"
+      ]
+    ]
+  },
+  {
+    "id": "sv",
+    "type": "inject",
+    "z": "t",
+    "name": "Bausteinwerte speichern",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 170,
+    "y": 960,
+    "wires": [
+      [
+        "svn"
+      ]
+    ]
+  },
+  {
+    "id": "svn",
+    "type": "easye4json-action",
+    "z": "t",
+    "name": "",
+    "device": "dev",
+    "action": "saveFB",
+    "devName": "",
+    "x": 420,
+    "y": 960,
+    "wires": [
+      [
+        "dbg"
+      ]
+    ]
+  },
+  {
+    "id": "c4",
+    "type": "comment",
+    "z": "t",
+    "name": "4) Schreiben (Merker müssen in easySoft zum Schreiben freigegeben sein)",
+    "info": "Passend zum ST-Programm easye4json-beispiel.st:\n- M1 = Fern-Ein (Q01)\n- M2 = Zähler-Reset (Impuls)\n- MW5 = Grenzwert für den Zähler (Q03)\n- MW6 = Testwert, das Programm schreibt MW6 * 2 nach MW7\n- MB4, MD8 = freie Testwerte\n- N(0;1) = NET-Merker (nur wenn ein NET eingerichtet ist)\n\nMerker überschneiden sich im Speicher (M1–M16 = MB1–MB2, MW1 = MB1+MB2, MD1 = MB1–MB4 …). Das Programm verwendet deshalb getrennte Bereiche: M1–M16, MB3–MB4, MW3–MW10, MD6–MD8.",
+    "x": 290,
+    "y": 1020,
+    "wires": []
+  },
+  {
+    "id": "w0",
+    "type": "inject",
+    "z": "t",
+    "name": "Grenzwert MW5 = 3",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "3",
+    "payloadType": "num",
+    "x": 170,
+    "y": 1060,
+    "wires": [
+      [
+        "w0n"
+      ]
+    ]
+  },
+  {
+    "opType": "MW",
+    "netId": 0,
+    "index": 5,
+    "fbName": "T",
+    "fbInst": 1,
+    "fbPinType": "2",
+    "fbPin": 0,
+    "mode": "operand",
+    "id": "w0n",
+    "type": "easye4json-write",
+    "z": "t",
+    "name": "",
+    "device": "dev",
+    "x": 420,
+    "y": 1060,
+    "wires": [
+      [
+        "dbg"
+      ]
+    ]
+  },
+  {
+    "id": "w1",
+    "type": "inject",
+    "z": "t",
+    "name": "Fern-Ein M1 = true",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "true",
+    "payloadType": "bool",
+    "x": 170,
+    "y": 1105,
+    "wires": [
+      [
+        "w1n"
+      ]
+    ]
+  },
+  {
+    "opType": "M",
+    "netId": 0,
+    "index": 1,
+    "fbName": "T",
+    "fbInst": 1,
+    "fbPinType": "2",
+    "fbPin": 0,
+    "mode": "operand",
+    "id": "w1n",
+    "type": "easye4json-write",
+    "z": "t",
+    "name": "",
+    "device": "dev",
+    "x": 420,
+    "y": 1105,
+    "wires": [
+      [
+        "dbg"
+      ]
+    ]
+  },
+  {
+    "id": "w2",
+    "type": "inject",
+    "z": "t",
+    "name": "Fern-Ein M1 = false",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "false",
+    "payloadType": "bool",
+    "x": 170,
+    "y": 1150,
+    "wires": [
+      [
+        "w2n"
+      ]
+    ]
+  },
+  {
+    "opType": "M",
+    "netId": 0,
+    "index": 1,
+    "fbName": "T",
+    "fbInst": 1,
+    "fbPinType": "2",
+    "fbPin": 0,
+    "mode": "operand",
+    "id": "w2n",
+    "type": "easye4json-write",
+    "z": "t",
+    "name": "",
+    "device": "dev",
+    "x": 420,
+    "y": 1150,
+    "wires": [
+      [
+        "dbg"
+      ]
+    ]
+  },
+  {
+    "id": "w3",
+    "type": "inject",
+    "z": "t",
+    "name": "MD8 = 100000",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "100000",
+    "payloadType": "num",
+    "x": 170,
+    "y": 1195,
+    "wires": [
+      [
+        "w3n"
+      ]
+    ]
+  },
+  {
+    "opType": "MD",
+    "netId": 0,
+    "index": 8,
+    "fbName": "T",
+    "fbInst": 1,
+    "fbPinType": "2",
+    "fbPin": 0,
+    "mode": "operand",
+    "id": "w3n",
+    "type": "easye4json-write",
+    "z": "t",
+    "name": "",
+    "device": "dev",
+    "x": 420,
+    "y": 1195,
+    "wires": [
+      [
+        "dbg"
+      ]
+    ]
+  },
+  {
+    "id": "w4",
+    "type": "inject",
+    "z": "t",
+    "name": "NET-Merker N(0;1) = 1",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "1",
+    "payloadType": "num",
+    "x": 170,
+    "y": 1240,
+    "wires": [
+      [
+        "w4n"
+      ]
+    ]
+  },
+  {
+    "opType": "N",
+    "netId": 0,
+    "index": 1,
+    "fbName": "T",
+    "fbInst": 1,
+    "fbPinType": "2",
+    "fbPin": 0,
+    "mode": "operand",
+    "id": "w4n",
+    "type": "easye4json-write",
+    "z": "t",
+    "name": "",
+    "device": "dev",
+    "x": 420,
+    "y": 1240,
+    "wires": [
+      [
+        "dbg"
+      ]
+    ]
+  },
+  {
+    "id": "wm",
+    "type": "inject",
+    "z": "t",
+    "name": "mehrere auf einmal",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "{\"M2\":1,\"MW6\":7,\"MB4\":200,\"T1(2;0)\":3000}",
+    "payloadType": "json",
+    "x": 170,
+    "y": 1285,
+    "wires": [
+      [
+        "wmn"
+      ]
+    ]
+  },
+  {
+    "opType": "M",
+    "netId": 0,
+    "index": 1,
+    "fbName": "T",
+    "fbInst": 1,
+    "fbPinType": "2",
+    "fbPin": 0,
+    "mode": "msg",
+    "id": "wmn",
+    "type": "easye4json-write",
+    "z": "t",
+    "name": "",
+    "device": "dev",
+    "x": 420,
+    "y": 1285,
+    "wires": [
+      [
+        "dbg"
+      ]
+    ]
+  },
+  {
+    "id": "c5",
+    "type": "comment",
+    "z": "t",
+    "name": "5) Aktionen (Uhr und Name nur in STOP; Name nur als admin)",
+    "info": "",
+    "x": 250,
+    "y": 1345,
+    "wires": []
+  },
+  {
+    "id": "a0",
+    "type": "inject",
+    "z": "t",
+    "name": "STOP",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 170,
+    "y": 1385,
+    "wires": [
+      [
+        "a0n"
+      ]
+    ]
+  },
+  {
+    "id": "a0n",
+    "type": "easye4json-action",
+    "z": "t",
+    "name": "",
+    "device": "dev",
+    "action": "stop",
+    "devName": "",
+    "x": 420,
+    "y": 1385,
+    "wires": [
+      [
+        "dbg"
+      ]
+    ]
+  },
+  {
+    "id": "a1",
+    "type": "inject",
+    "z": "t",
+    "name": "Uhr = Node-RED-Zeit",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 170,
+    "y": 1430,
+    "wires": [
+      [
+        "a1n"
+      ]
+    ]
+  },
+  {
+    "id": "a1n",
+    "type": "easye4json-action",
+    "z": "t",
+    "name": "",
+    "device": "dev",
+    "action": "setClock",
+    "devName": "",
+    "x": 420,
+    "y": 1430,
+    "wires": [
+      [
+        "dbg"
+      ]
+    ]
+  },
+  {
+    "id": "a2",
+    "type": "inject",
+    "z": "t",
+    "name": "Datum = 2026-12-24",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "2026-12-24",
+    "payloadType": "str",
+    "x": 170,
+    "y": 1475,
+    "wires": [
+      [
+        "a2n"
+      ]
+    ]
+  },
+  {
+    "id": "a2n",
+    "type": "easye4json-action",
+    "z": "t",
+    "name": "",
+    "device": "dev",
+    "action": "setDate",
+    "devName": "",
+    "x": 420,
+    "y": 1475,
+    "wires": [
+      [
+        "dbg"
+      ]
+    ]
+  },
+  {
+    "id": "a3",
+    "type": "inject",
+    "z": "t",
+    "name": "Uhrzeit = 12:00:00",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "2026-01-01 12:00:00",
+    "payloadType": "str",
+    "x": 170,
+    "y": 1520,
+    "wires": [
+      [
+        "a3n"
+      ]
+    ]
+  },
+  {
+    "id": "a3n",
+    "type": "easye4json-action",
+    "z": "t",
+    "name": "",
+    "device": "dev",
+    "action": "setTime",
+    "devName": "",
+    "x": 420,
+    "y": 1520,
+    "wires": [
+      [
+        "dbg"
+      ]
+    ]
+  },
+  {
+    "id": "a4",
+    "type": "inject",
+    "z": "t",
+    "name": "Gerätename",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 170,
+    "y": 1565,
+    "wires": [
+      [
+        "a4n"
+      ]
+    ]
+  },
+  {
+    "id": "a4n",
+    "type": "easye4json-action",
+    "z": "t",
+    "name": "",
+    "device": "dev",
+    "action": "setName",
+    "devName": "Halle1",
+    "x": 420,
+    "y": 1565,
+    "wires": [
+      [
+        "dbg"
+      ]
+    ]
+  },
+  {
+    "id": "a5",
+    "type": "inject",
+    "z": "t",
+    "name": "RUN",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 170,
+    "y": 1610,
+    "wires": [
+      [
+        "a5n"
+      ]
+    ]
+  },
+  {
+    "id": "a5n",
+    "type": "easye4json-action",
+    "z": "t",
+    "name": "",
+    "device": "dev",
+    "action": "run",
+    "devName": "",
+    "x": 420,
+    "y": 1610,
+    "wires": [
+      [
+        "dbg"
+      ]
+    ]
+  },
+  {
+    "id": "a6",
+    "type": "inject",
+    "z": "t",
+    "name": "freie Anfrage CYC",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "/api/get/data?elm=CYC",
+    "payloadType": "str",
+    "x": 170,
+    "y": 1655,
+    "wires": [
+      [
+        "a6n"
+      ]
+    ]
+  },
+  {
+    "id": "a6n",
+    "type": "easye4json-action",
+    "z": "t",
+    "name": "",
+    "device": "dev",
+    "action": "request",
+    "devName": "",
+    "x": 420,
+    "y": 1655,
+    "wires": [
+      [
+        "dbg"
+      ]
+    ]
+  },
+  {
+    "id": "am",
+    "type": "inject",
+    "z": "t",
+    "name": "msg.action = \"stop\"",
+    "props": [
+      {
+        "p": "payload"
+      },
+      {
+        "p": "action",
+        "v": "stop",
+        "vt": "str"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 170,
+    "y": 1700,
+    "wires": [
+      [
+        "amn"
+      ]
+    ]
+  },
+  {
+    "id": "amn",
+    "type": "easye4json-action",
+    "z": "t",
+    "name": "",
+    "device": "dev",
+    "action": "msg",
+    "devName": "",
+    "x": 420,
+    "y": 1700,
+    "wires": [
+      [
+        "dbg"
+      ]
+    ]
+  },
+  {
+    "id": "c6",
+    "type": "comment",
+    "z": "t",
+    "name": "Fehler abfangen",
+    "info": "",
+    "x": 120,
+    "y": 1760,
+    "wires": []
+  },
+  {
+    "id": "ct",
+    "type": "catch",
+    "z": "t",
+    "name": "",
+    "scope": null,
+    "uncaught": false,
+    "x": 130,
+    "y": 1800,
+    "wires": [
+      [
+        "dbgE"
+      ]
+    ]
+  },
+  {
+    "id": "dbgE",
+    "type": "debug",
+    "z": "t",
+    "name": "Fehler",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "error",
+    "targetType": "msg",
+    "x": 420,
+    "y": 1800,
+    "wires": []
+  },
+  {
+    "id": "dbg",
+    "type": "debug",
+    "z": "t",
+    "name": "",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "complete": "true",
+    "targetType": "full",
+    "x": 900,
+    "y": 900,
+    "wires": []
+  }
+]

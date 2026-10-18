@@ -1,0 +1,241 @@
+{
+    "easye4json": {
+        "status": {
+            "offline": "easyE4 nicht erreichbar",
+            "auth": "Anmeldung abgelehnt",
+            "online": "easyE4 erreichbar",
+            "unknown": "noch keine Abfrage",
+            "values": "__n__ Werte",
+            "written": "__n__ × geschrieben"
+        },
+        "errors": {
+            "noHost": "Adresse der easyE4 fehlt",
+            "noUser": "Benutzername fehlt",
+            "noApiKey": "API-Schlüssel fehlt",
+            "noDevice": "Keine easyE4 (JSON) ausgewählt",
+            "network": "easyE4 __host__ nicht erreichbar (__msg__)",
+            "closed": "Verbindung wurde beendet",
+            "queueFull": "Zu viele Anfragen gleichzeitig (Abfrage-Intervall vergrößern)",
+            "noValue": "Keine Antwort für __elm__ (gibt es den Operanden bzw. Baustein im Gerät?)",
+            "noElementInMsg": "Nichts zu lesen: msg.topic oder msg.payload = z. B. \"MW3\" oder \"M1, MW(1,8), STATE\"",
+            "payloadMissing": "msg.payload (Wert) fehlt",
+            "noWriteTarget": "Kein Ziel: msg.topic = Operand (z. B. \"MW3\") oder msg.payload = {MW3: 42, M5: 1}",
+            "noOperands": "Keine Operanden angegeben",
+            "nameMissing": "Gerätename fehlt (im Dialog oder msg.payload)",
+            "badRequestPath": "msg.payload muss eine API-Adresse sein, z. B. \"/api/get/data?elm=CYC\"",
+            "unknownAction": "Unbekannte Aktion '__action__' (erlaubt: __list__)",
+            "noAction": "Keine Aktion: im Dialog wählen oder msg.action setzen (__list__)",
+            "needStop": "Nur im Zustand STOP möglich (vorher Aktion STOP ausführen)",
+            "indexRange": "__what__: Nummer muss zwischen 1 und __max__ liegen",
+            "netRange": "NET-ID muss zwischen 0 und 8 liegen",
+            "unknownType": "Unbekannter Operand '__type__'",
+            "rangeOrder": "Bereich: Ende muss größer oder gleich Anfang sein",
+            "noAll": "\"Alle\" gibt es nur für I, Q, AI, AO und M (nicht für __type__)",
+            "fbName": "Bausteinname fehlt oder ist ungültig (z. B. T, C, A, AC)",
+            "fbInst": "Bausteinnummer muss zwischen 1 und 255 liegen",
+            "fbPinType": "Anschluss-Art muss 0–3 sein",
+            "fbWritePinType": "Schreiben geht nur auf Eingänge: Anschluss-Art 0 (Bit) oder 2 (Wort)",
+            "fbPin": "Anschluss-Nummer muss zwischen 0 und 63 liegen",
+            "unknownSys": "Unbekannte Systeminformation '__name__'",
+            "emptyElement": "Nichts angegeben",
+            "badElement": "Nicht verstanden: '__text__' (Beispiele: MW3, MW(1,8), N(2;5), STATE, T1(2;0))",
+            "invalidValue": "Ungültiger Wert: erwartet Zahl oder true/false",
+            "integer": "Nur ganze Zahlen erlaubt",
+            "notWritable": "__type__ ist über die JSON-API nicht beschreibbar (nur M, MB, MW, MD, N, NB, NW, ND und Baustein-Eingänge)",
+            "valueRange": "__name__: Wert muss zwischen __min__ und __max__ liegen",
+            "badDate": "Datum/Uhrzeit in msg.payload nicht lesbar (leer = jetzt, Zeitstempel oder z. B. \"2026-10-18 12:00:00\")",
+            "tls": "HTTPS-Verbindung zu __host__ gescheitert (__msg__): Verschlüsselung bzw. Zertifikat wird nicht akzeptiert. Haken „Zertifikat prüfen“ entfernen oder Protokoll http versuchen."
+        },
+        "http": {
+            "400": "Anfrage abgelehnt (400): Befehl unbekannt oder falsch geschrieben",
+            "401": "Anmeldung abgelehnt (401): Benutzer/Passwort bzw. API-Schlüssel prüfen",
+            "403": "Nicht erlaubt (403): Rechte in easySoft 7/8 prüfen; Name/Datum/Uhrzeit nur in STOP, Bausteinwerte nur in RUN",
+            "404": "Nicht gefunden (404): Ist der Webserver der easyE4 eingeschaltet?",
+            "other": "Fehler der easyE4 (HTTP __code__)",
+            "501": "Nicht unterstützt (501): Funktion gibt es in dieser Firmware nicht",
+            "503": "easyE4 ausgelastet (503): später erneut versuchen bzw. seltener abfragen",
+            "401adm": "Keine Berechtigung (401): Gerätename und Admin-Einstellungen darf nur der Benutzer „admin“ ändern (Anmeldung mit Benutzer + Passwort)",
+            "401set": "Keine Berechtigung (401): Dieser Benutzer darf das nicht – Rechte in easySoft prüfen (Merker schreiben, Betriebsart „mode“, Uhr „clock“)"
+        },
+        "apiError": {
+            "3": "Unbekannter Dienst (Element falsch geschrieben?)",
+            "4": "Zu viele Parameter",
+            "5": "Parameter fehlen",
+            "6": "Anfrage falsch aufgebaut (z. B. fehlende Klammer)",
+            "7": "Bereich ungültig",
+            "8": "Nummer (Index) ungültig",
+            "9": "NET-ID ungültig",
+            "10": "Befehl konnte nicht ausgeführt werden",
+            "32": "Diesen Funktionsbaustein gibt es nicht",
+            "33": "Diese Bausteinnummer gibt es im Programm nicht",
+            "34": "Anschluss-Art passt nicht zu diesem Baustein",
+            "35": "Anschluss-Nummer passt nicht zu diesem Baustein",
+            "36": "Wort-Eingang ist im Programm nicht mit einer Konstanten verbunden",
+            "37": "Wert außerhalb des erlaubten Bereichs",
+            "unknown": "API-Fehler __code__ (siehe Eaton-Doku \"API Error Codes\")"
+        },
+        "test": {
+            "button": "Verbindung testen",
+            "running": "teste...",
+            "ok": "OK: \"__name__\", Firmware __version__, __state__",
+            "failed": "Fehler"
+        },
+        "label": {
+            "device": "Steuerung",
+            "host": "Adresse",
+            "protocol": "Protokoll",
+            "port": "Port",
+            "verifyCert": "Zertifikat prüfen (nur bei eigenem, gültigem Zertifikat)",
+            "auth": "Anmeldung",
+            "user": "Benutzer",
+            "password": "Passwort",
+            "apikey": "API-Schlüssel",
+            "readPath": "Lesen über",
+            "timeout": "Zeitlimit",
+            "mode": "Lesen",
+            "writeMode": "Schreiben",
+            "operand": "Operand",
+            "netId": "NET-ID",
+            "index": "Nummer",
+            "rangeEnd": "bis",
+            "allType": "Operand",
+            "sys": "Information",
+            "fbName": "Baustein",
+            "fbInst": "Nummer",
+            "fbPinType": "Anschluss-Art",
+            "fbPin": "Anschluss-Nr.",
+            "list": "Liste",
+            "interval": "Abfragen alle",
+            "seconds": "Sekunden (0 = nur bei eingehender Nachricht, sonst mind. 0,5)",
+            "onlyChange": "Nur bei Änderung ausgeben",
+            "action": "Aktion",
+            "devName": "Neuer Name",
+            "element": "Anfrage",
+            "gap": "Pause",
+            "gapHint": "zwischen zwei Anfragen (Standard 50)"
+        },
+        "auth": {
+            "none": "Ohne Anmeldung (Gast)",
+            "basic": "Benutzer + Passwort",
+            "bearer": "API-Schlüssel"
+        },
+        "readPath": {
+            "auto": "automatisch (admin → /api/get/adm)",
+            "data": "/api/get/data",
+            "adm": "/api/get/adm"
+        },
+        "mode": {
+            "operand": "Einen Operanden",
+            "range": "Bereich (z. B. MW1 bis MW8)",
+            "all": "Alle (I, Q, AI, AO oder M)",
+            "sys": "Systeminformation (Zustand, Uhrzeit ...)",
+            "fb": "Funktionsbaustein-Anschluss",
+            "list": "Mehrere (Liste)",
+            "msg": "Aus der Nachricht (msg.topic / msg.payload)"
+        },
+        "op": {
+            "I": "I – Eingang (Bit)",
+            "Q": "Q – Ausgang (Bit)",
+            "AI": "AI – Analogeingang",
+            "AO": "AO – Analogausgang",
+            "ID": "ID – Diagnose (Bit)",
+            "M": "M – Merker (Bit)",
+            "MB": "MB – Merker (Byte)",
+            "MW": "MW – Merker (Wort)",
+            "MD": "MD – Merker (Doppelwort)",
+            "N": "N – NET-Merker (Bit)",
+            "NB": "NB – NET-Merker (Byte)",
+            "NW": "NW – NET-Merker (Wort)",
+            "ND": "ND – NET-Merker (Doppelwort)"
+        },
+        "sys": {
+            "STATE": "Betriebsart (RUN/STOP)",
+            "VERSION": "Firmware-Version",
+            "DEVNAME": "Gerätename",
+            "PROGNAME": "Programmname",
+            "DATE": "Datum",
+            "TIME": "Uhrzeit",
+            "CYC": "Zykluszeit",
+            "DIAG": "Diagnosemeldungen",
+            "EXTSTATE": "Erweiterungsmodule",
+            "IPSET": "IP-Einstellungen",
+            "DEVID": "NET-ID des Geräts",
+            "DEVLANG": "Menüsprache",
+            "DEVLOCATION": "Standort (ab Firmware 1.20)",
+            "EMAIL": "E-Mail-Einstellungen",
+            "EMAILGROUPS": "E-Mail-Empfänger"
+        },
+        "pinType": {
+            "0": "0 – Bit-Eingang",
+            "1": "1 – Bit-Ausgang",
+            "2": "2 – Wort-Eingang",
+            "3": "3 – Wort-Ausgang"
+        },
+        "writeMode": {
+            "operand": "Einen Operanden (Wert aus msg.payload)",
+            "fb": "Funktionsbaustein-Eingang (Wert aus msg.payload)",
+            "msg": "Aus der Nachricht (msg.topic / msg.payload)"
+        },
+        "placeholder": {
+            "host": "z. B. 192.168.178.50",
+            "list": "z. B. M1, MW3, Q(1,4), STATE, T1(2;0)",
+            "fbName": "z. B. T"
+        },
+        "tips": {
+            "device": "In <b>easySoft 7/8</b> (Projekt → Webserver) muss der Webserver eingeschaltet sein (<i>Web server enabled</i>, <i>Always enabled</i>). Für Ein-/Ausgänge zusätzlich <i>Enable read I/O</i>, für Lesen ohne Anmeldung <i>Anonymous read access allowed</i>. Zum Schreiben einen Benutzer mit Schreibrechten anlegen (die Feldnamen können in der deutschen Oberfläche etwas anders lauten).",
+            "read": "Die Werte holt der Knoten selbst ab: in festen Abständen (<i>Abfragen alle</i>) und/oder bei jeder eingehenden Nachricht.",
+            "write": "Beschreibbar sind nur M, MB, MW, MD, die NET-Merker N, NB, NW, ND und Eingänge von Funktionsbausteinen (ab Firmware 1.20). Ein- und Ausgänge (I, Q, AI, AO) lassen sich nicht setzen. Der Benutzer braucht dafür in easySoft 7/8 Schreibrechte und einen freigegebenen Merkerbereich.",
+            "fbWrite": "Bit-Eingänge dürfen im Programm <b>nicht</b> verbunden sein, Wort-Eingänge <b>müssen</b> mit einer Konstanten verbunden sein. Zeiten immer in Millisekunden. Nur in RUN."
+        },
+        "read": {
+            "paletteLabel": "easyE4 JSON lesen",
+            "label": "easyE4 lesen",
+            "input": "Auslöser",
+            "output": "Wert"
+        },
+        "write": {
+            "paletteLabel": "easyE4 JSON schreiben",
+            "label": "easyE4 schreiben",
+            "input": "Wert",
+            "output": "Ergebnis"
+        },
+        "action": {
+            "paletteLabel": "easyE4 JSON aktion",
+            "input": "Auslöser",
+            "output": "Antwort",
+            "opt": {
+                "run": "RUN starten",
+                "stop": "STOP",
+                "setClock": "Datum + Uhrzeit stellen",
+                "setDate": "Datum stellen",
+                "setTime": "Uhrzeit stellen",
+                "setName": "Gerätename ändern",
+                "saveFB": "Baustein-Änderungen dauerhaft speichern",
+                "request": "Freie Anfrage (für Fortgeschrittene)",
+                "msg": "Aus der Nachricht (msg.action)"
+            },
+            "label": {
+                "msg": "Aktion aus msg.action",
+                "run": "RUN",
+                "stop": "STOP",
+                "setClock": "Uhr stellen",
+                "setDate": "Datum stellen",
+                "setTime": "Uhrzeit stellen",
+                "setName": "Name ändern",
+                "saveFB": "FB speichern",
+                "request": "Anfrage"
+            },
+            "tip": {
+                "msg": "Die Aktion kommt aus <code>msg.action</code>: run, stop, setClock, setDate, setTime, setName, saveFB, request.",
+                "run": "Startet das Programm (RUN).",
+                "stop": "Stoppt das Programm (STOP).",
+                "setClock": "Stellt Datum und Uhrzeit. Ohne <code>msg.payload</code> die aktuelle Zeit von Node-RED, sonst z. B. <code>\"2026-10-18 12:00:00\"</code>. <b>Nur in STOP möglich.</b>",
+                "setDate": "Wie <i>Datum + Uhrzeit</i>, aber nur das Datum. <b>Nur in STOP.</b>",
+                "setTime": "Wie <i>Datum + Uhrzeit</i>, aber nur die Uhrzeit. <b>Nur in STOP.</b>",
+                "setName": "Neuer Name aus dem Feld oder aus <code>msg.payload</code>. <b>Nur in STOP.</b>",
+                "saveFB": "Über die JSON-API geänderte Konstanten von Funktionsbausteinen bleiben nach einem Neustart erhalten (ab Firmware 1.20).",
+                "request": "<code>msg.payload</code> ist eine API-Adresse, z. B. <code>/api/get/data?elm=CYC</code>. Die Antwort kommt unverändert in <code>msg.payload</code>."
+            }
+        }
+    }
+}

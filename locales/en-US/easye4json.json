@@ -1,0 +1,241 @@
+{
+    "easye4json": {
+        "status": {
+            "offline": "easyE4 not reachable",
+            "auth": "login rejected",
+            "online": "easyE4 reachable",
+            "unknown": "no request yet",
+            "values": "__n__ values",
+            "written": "written __n__ ×"
+        },
+        "errors": {
+            "noHost": "Address of the easyE4 missing",
+            "noUser": "User name missing",
+            "noApiKey": "API key missing",
+            "noDevice": "No easyE4 (JSON) selected",
+            "network": "easyE4 __host__ not reachable (__msg__)",
+            "closed": "Connection closed",
+            "queueFull": "Too many requests at once (increase the poll interval)",
+            "noValue": "No answer for __elm__ (does the operand or function block exist in the device?)",
+            "noElementInMsg": "Nothing to read: msg.topic or msg.payload = e.g. \"MW3\" or \"M1, MW(1,8), STATE\"",
+            "payloadMissing": "msg.payload (value) missing",
+            "noWriteTarget": "No target: msg.topic = operand (e.g. \"MW3\") or msg.payload = {MW3: 42, M5: 1}",
+            "noOperands": "No operands given",
+            "nameMissing": "Device name missing (dialog or msg.payload)",
+            "badRequestPath": "msg.payload must be an API address, e.g. \"/api/get/data?elm=CYC\"",
+            "unknownAction": "Unknown action '__action__' (allowed: __list__)",
+            "noAction": "No action: select one in the dialog or set msg.action (__list__)",
+            "needStop": "Only possible in STOP (run the STOP action first)",
+            "indexRange": "__what__: number must be between 1 and __max__",
+            "netRange": "NET ID must be between 0 and 8",
+            "unknownType": "Unknown operand '__type__'",
+            "rangeOrder": "Range: end must be greater than or equal to start",
+            "noAll": "\"All\" exists only for I, Q, AI, AO and M (not for __type__)",
+            "fbName": "Function block name missing or invalid (e.g. T, C, A, AC)",
+            "fbInst": "Function block number must be between 1 and 255",
+            "fbPinType": "Pin type must be 0–3",
+            "fbWritePinType": "Only inputs can be written: pin type 0 (bit) or 2 (word)",
+            "fbPin": "Pin number must be between 0 and 63",
+            "unknownSys": "Unknown system information '__name__'",
+            "emptyElement": "Nothing given",
+            "badElement": "Not understood: '__text__' (examples: MW3, MW(1,8), N(2;5), STATE, T1(2;0))",
+            "invalidValue": "Invalid value: number or true/false expected",
+            "integer": "Only whole numbers allowed",
+            "notWritable": "__type__ cannot be written via the JSON API (only M, MB, MW, MD, N, NB, NW, ND and function block inputs)",
+            "valueRange": "__name__: value must be between __min__ and __max__",
+            "badDate": "Date/time in msg.payload not readable (empty = now, timestamp or e.g. \"2026-10-18 12:00:00\")",
+            "tls": "HTTPS connection to __host__ failed (__msg__): encryption or certificate not accepted. Uncheck “Verify certificate” or try protocol http."
+        },
+        "http": {
+            "400": "Request rejected (400): unknown or misspelled command",
+            "401": "Login rejected (401): check user/password or API key",
+            "403": "Not allowed (403): check the rights in easySoft 7/8; name/date/time only in STOP, function block values only in RUN",
+            "404": "Not found (404): is the web server of the easyE4 enabled?",
+            "other": "easyE4 error (HTTP __code__)",
+            "501": "Not implemented (501): function not available in this firmware",
+            "503": "easyE4 busy (503): try again later or poll less often",
+            "401adm": "No permission (401): only the user \"admin\" may change the device name and admin settings (log in with user + password)",
+            "401set": "No permission (401): this user is not allowed to do this – check the rights in easySoft (write markers, mode, clock)"
+        },
+        "apiError": {
+            "3": "Unknown service (element misspelled?)",
+            "4": "Too many parameters",
+            "5": "Parameters missing",
+            "6": "Request malformed (e.g. missing bracket)",
+            "7": "Range invalid",
+            "8": "Number (index) invalid",
+            "9": "NET ID invalid",
+            "10": "Command could not be completed",
+            "32": "This function block type does not exist",
+            "33": "This function block number does not exist in the program",
+            "34": "Pin type does not fit this function block",
+            "35": "Pin number does not fit this function block",
+            "36": "Word input is not connected to a constant in the program",
+            "37": "Value out of range",
+            "unknown": "API error __code__ (see Eaton documentation \"API Error Codes\")"
+        },
+        "test": {
+            "button": "Test connection",
+            "running": "testing...",
+            "ok": "OK: \"__name__\", firmware __version__, __state__",
+            "failed": "Error"
+        },
+        "label": {
+            "device": "Controller",
+            "host": "Address",
+            "protocol": "Protocol",
+            "port": "Port",
+            "verifyCert": "Verify certificate (only with your own valid certificate)",
+            "auth": "Login",
+            "user": "User",
+            "password": "Password",
+            "apikey": "API key",
+            "readPath": "Read via",
+            "timeout": "Timeout",
+            "mode": "Read",
+            "writeMode": "Write",
+            "operand": "Operand",
+            "netId": "NET ID",
+            "index": "Number",
+            "rangeEnd": "to",
+            "allType": "Operand",
+            "sys": "Information",
+            "fbName": "Block",
+            "fbInst": "Number",
+            "fbPinType": "Pin type",
+            "fbPin": "Pin no.",
+            "list": "List",
+            "interval": "Poll every",
+            "seconds": "seconds (0 = only on incoming message, otherwise min. 0.5)",
+            "onlyChange": "Output only on change",
+            "action": "Action",
+            "devName": "New name",
+            "element": "Request",
+            "gap": "Pause",
+            "gapHint": "between two requests (default 50)"
+        },
+        "auth": {
+            "none": "No login (guest)",
+            "basic": "User + password",
+            "bearer": "API key"
+        },
+        "readPath": {
+            "auto": "automatic (admin → /api/get/adm)",
+            "data": "/api/get/data",
+            "adm": "/api/get/adm"
+        },
+        "mode": {
+            "operand": "One operand",
+            "range": "Range (e.g. MW1 to MW8)",
+            "all": "All (I, Q, AI, AO or M)",
+            "sys": "System information (state, time ...)",
+            "fb": "Function block pin",
+            "list": "Several (list)",
+            "msg": "From the message (msg.topic / msg.payload)"
+        },
+        "op": {
+            "I": "I – Input (bit)",
+            "Q": "Q – Output (bit)",
+            "AI": "AI – Analog input",
+            "AO": "AO – Analog output",
+            "ID": "ID – Diagnostics (bit)",
+            "M": "M – Marker (bit)",
+            "MB": "MB – Marker (byte)",
+            "MW": "MW – Marker (word)",
+            "MD": "MD – Marker (double word)",
+            "N": "N – NET marker (bit)",
+            "NB": "NB – NET marker (byte)",
+            "NW": "NW – NET marker (word)",
+            "ND": "ND – NET marker (double word)"
+        },
+        "sys": {
+            "STATE": "Operating mode (RUN/STOP)",
+            "VERSION": "Firmware version",
+            "DEVNAME": "Device name",
+            "PROGNAME": "Program name",
+            "DATE": "Date",
+            "TIME": "Time",
+            "CYC": "Cycle time",
+            "DIAG": "Diagnostic messages",
+            "EXTSTATE": "Expansion modules",
+            "IPSET": "IP settings",
+            "DEVID": "NET ID of the device",
+            "DEVLANG": "Menu language",
+            "DEVLOCATION": "Location (firmware 1.20 or later)",
+            "EMAIL": "E-mail settings",
+            "EMAILGROUPS": "E-mail recipients"
+        },
+        "pinType": {
+            "0": "0 – Bit input",
+            "1": "1 – Bit output",
+            "2": "2 – Word input",
+            "3": "3 – Word output"
+        },
+        "writeMode": {
+            "operand": "One operand (value from msg.payload)",
+            "fb": "Function block input (value from msg.payload)",
+            "msg": "From the message (msg.topic / msg.payload)"
+        },
+        "placeholder": {
+            "host": "e.g. 192.168.178.50",
+            "list": "e.g. M1, MW3, Q(1,4), STATE, T1(2;0)",
+            "fbName": "e.g. T"
+        },
+        "tips": {
+            "device": "In <b>easySoft 7/8</b> (project → web server) the web server must be on (<i>Web server enabled</i>, <i>Always enabled</i>). For inputs/outputs also <i>Enable read I/O</i>, for reading without login <i>Anonymous read access allowed</i>. To write, create a user with write permission.",
+            "read": "The node fetches the values itself: at fixed intervals (<i>Poll every</i>) and/or on every incoming message.",
+            "write": "Only M, MB, MW, MD, the NET markers N, NB, NW, ND and function block inputs (firmware 1.20 or later) can be written. Inputs and outputs (I, Q, AI, AO) cannot be set. The user needs write permission and an enabled marker range in easySoft 7/8.",
+            "fbWrite": "Bit inputs must <b>not</b> be connected in the program, word inputs <b>must</b> be connected to a constant. Times always in milliseconds. Only in RUN."
+        },
+        "read": {
+            "paletteLabel": "easyE4 JSON read",
+            "label": "easyE4 read",
+            "input": "trigger",
+            "output": "value"
+        },
+        "write": {
+            "paletteLabel": "easyE4 JSON write",
+            "label": "easyE4 write",
+            "input": "value",
+            "output": "result"
+        },
+        "action": {
+            "paletteLabel": "easyE4 JSON action",
+            "input": "trigger",
+            "output": "response",
+            "opt": {
+                "run": "Start RUN",
+                "stop": "STOP",
+                "setClock": "Set date + time",
+                "setDate": "Set date",
+                "setTime": "Set time",
+                "setName": "Change device name",
+                "saveFB": "Save function block changes permanently",
+                "request": "Free request (advanced)",
+                "msg": "From the message (msg.action)"
+            },
+            "label": {
+                "msg": "action from msg.action",
+                "run": "RUN",
+                "stop": "STOP",
+                "setClock": "set clock",
+                "setDate": "set date",
+                "setTime": "set time",
+                "setName": "change name",
+                "saveFB": "save FB",
+                "request": "request"
+            },
+            "tip": {
+                "msg": "The action comes from <code>msg.action</code>: run, stop, setClock, setDate, setTime, setName, saveFB, request.",
+                "run": "Starts the program (RUN).",
+                "stop": "Stops the program (STOP).",
+                "setClock": "Sets date and time. Without <code>msg.payload</code> the current Node-RED time, otherwise e.g. <code>\"2026-10-18 12:00:00\"</code>. <b>Only possible in STOP.</b>",
+                "setDate": "Like <i>date + time</i>, but only the date. <b>Only in STOP.</b>",
+                "setTime": "Like <i>date + time</i>, but only the time. <b>Only in STOP.</b>",
+                "setName": "New name from the field or from <code>msg.payload</code>. <b>Only in STOP.</b>",
+                "saveFB": "Function block constants changed via the JSON API are kept after a restart (firmware 1.20 or later).",
+                "request": "<code>msg.payload</code> is an API address, e.g. <code>/api/get/data?elm=CYC</code>. The answer is passed unchanged in <code>msg.payload</code>."
+            }
+        }
+    }
+}

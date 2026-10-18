@@ -1,0 +1,582 @@
+<!-- easyE4 über die JSON-API (ältere Geräte ohne MQTT) / easyE4 via the JSON API (older devices without MQTT)
+     Texte: locales/<sprache>/easye4json.json, Hilfe: locales/<sprache>/easye4json.html (de, en-US) -->
+
+<!-- ===================== gemeinsame Hilfsfunktionen / shared editor helpers ===================== -->
+<script type="text/javascript">
+    (function () {
+        var NET = /^(N|NB|NW|ND)$/;
+        var MAX = { ID: 96, M: 512, MB: 512, MW: 512, MD: 256, N: 512, NB: 64, NW: 32, ND: 16 };
+        function val(id, node, key) {
+            var $e = $(id);
+            return $e.length ? $e.val() : node[key];
+        }
+        function intOk(v, min, max) {
+            var s = String(v === undefined || v === null ? "" : v).trim();
+            if (!/^\d+$/.test(s)) return false;
+            var n = parseInt(s, 10);
+            return n >= min && n <= max;
+        }
+        function apiType(t) { return t === "Q" ? "O" : t; }
+
+        window.easyE4Json = {
+            NET: NET,
+            // Element-Text wie er an die easyE4 geht (nur zur Anzeige im Dialog und in der Beschriftung)
+            elementText: function (n) {
+                var mode = n.mode || "operand";
+                var t = apiType(n.opType || "M");
+                var net = NET.test(t) ? (n.netId || 0) + ";" : "";
+                switch (mode) {
+                    case "operand": return t + "(" + net + (n.index || "?") + ")";
+                    case "range": return t + "(" + net + (n.index || "?") + "," + (n.rangeEnd || "?") + ")";
+                    case "all": return apiType(n.allType || "I");
+                    case "sys": return n.sys || "STATE";
+                    case "fb": return "FB" + String(n.fbName || "?").toUpperCase() + (n.fbInst || "?") + "(" + (n.fbPinType || 0) + ";" + (n.fbPin || 0) + ")";
+                    case "list": return String(n.list || "").split(/[\n]/).join(" ").trim();
+                    default: return "";
+                }
+            },
+            shortLabel: function (n) {
+                var mode = n.mode || "operand";
+                var t = n.opType || "M";
+                var net = NET.test(t) ? (n.netId || 0) + ";" : "";
+                if (mode === "operand") return NET.test(t) ? t + "(" + net + (n.index || "?") + ")" : t + (n.index || "?");
+                if (mode === "range") return t + (n.index || "?") + "–" + t + (n.rangeEnd || "?") + (NET.test(t) ? " @" + (n.netId || 0) : "");
+                if (mode === "fb") return String(n.fbName || "?").toUpperCase() + (n.fbInst || "?") + " (" + (n.fbPinType || 0) + ";" + (n.fbPin || 0) + ")";
+                var s = easyE4Json.elementText(n);
+                if (mode === "all") s = s === "O" ? "Q" : s;
+                return s.length > 25 ? s.slice(0, 22) + "..." : s;
+            },
+            // Validatoren: im geöffneten Dialog zählen die Felder, sonst die gespeicherten Werte
+            vIndex: function (v) {
+                var m = val("#node-input-mode", this, "mode") || "operand";
+                if (m !== "operand" && m !== "range") return true;
+                var t = val("#node-input-opType", this, "opType") || "M";
+                return intOk(v, 1, MAX[t] || 999);
+            },
+            vRangeEnd: function (v) {
+                var m = val("#node-input-mode", this, "mode") || "operand";
+                if (m !== "range") return true;
+                var t = val("#node-input-opType", this, "opType") || "M";
+                var a = parseInt(val("#node-input-index", this, "index"), 10);
+                return intOk(v, 1, MAX[t] || 999) && parseInt(v, 10) >= a;
+            },
+            vNet: function (v) {
+                var m = val("#node-input-mode", this, "mode") || "operand";
+                var t = val("#node-input-opType", this, "opType") || "M";
+                if ((m !== "operand" && m !== "range") || !NET.test(t)) return true;
+                return intOk(v, 0, 8);
+            },
+            vFbName: function (v) {
+                var m = val("#node-input-mode", this, "mode") || "operand";
+                if (m !== "fb") return true;
+                return /^[A-Za-z]{1,3}$/.test(String(v || "").trim());
+            },
+            vFbInst: function (v) {
+                var m = val("#node-input-mode", this, "mode") || "operand";
+                return m !== "fb" || intOk(v, 1, 255);
+            },
+            vFbPin: function (v) {
+                var m = val("#node-input-mode", this, "mode") || "operand";
+                return m !== "fb" || intOk(v, 0, 63);
+            },
+            vList: function (v) {
+                var m = val("#node-input-mode", this, "mode") || "operand";
+                return m !== "list" || String(v || "").trim().length > 0;
+            },
+            // Felder je nach Auswahl ein-/ausblenden
+            bind: function (node, isWrite) {
+                function update() {
+                    var m = $("#node-input-mode").val();
+                    var t = $("#node-input-opType").val();
+                    var opMode = m === "operand" || m === "range";
+                    $(".e4j-op").toggle(opMode);
+                    $(".e4j-net").toggle(opMode && NET.test(t));
+                    $(".e4j-end").toggle(m === "range");
+                    $(".e4j-all").toggle(m === "all");
+                    $(".e4j-sys").toggle(m === "sys");
+                    $(".e4j-fb").toggle(m === "fb");
+                    $(".e4j-list").toggle(m === "list");
+                    $(".e4j-poll").toggle(m !== "msg");
+                    $(".e4j-fbtip").toggle(m === "fb");
+                    var preview = {
+                        mode: m, opType: t, netId: $("#node-input-netId").val(), index: $("#node-input-index").val(),
+                        rangeEnd: $("#node-input-rangeEnd").val(), allType: $("#node-input-allType").val(),
+                        sys: $("#node-input-sys").val(), fbName: $("#node-input-fbName").val(), fbInst: $("#node-input-fbInst").val(),
+                        fbPinType: $("#node-input-fbPinType").val(), fbPin: $("#node-input-fbPin").val(), list: $("#node-input-list").val(),
+                    };
+                    var txt = m === "msg" ? "–" : easyE4Json.elementText(preview);
+                    if (isWrite && m === "operand") txt = "/api/set/op?op=" + t + "&index=" + (preview.index || "?") + (NET.test(t) ? "&netid=" + (preview.netId || 0) : "") + "&val=…";
+                    if (isWrite && m === "fb") txt = "/api/set/par?op=FB&v1=" + String(preview.fbName || "?").toUpperCase() + (preview.fbInst || "?") + "(" + preview.fbPinType + ";" + (preview.fbPin || 0) + ";…)";
+                    if (!isWrite && m !== "msg") txt = "elm=" + txt;
+                    $("#e4j-preview").text(txt);
+                    $("#node-input-index, #node-input-rangeEnd, #node-input-netId, #node-input-fbName, #node-input-fbInst, #node-input-fbPin, #node-input-list").trigger("validate");
+                }
+                $("#node-input-mode, #node-input-opType, #node-input-allType, #node-input-sys, #node-input-fbPinType").on("change", update);
+                $("#node-input-index, #node-input-rangeEnd, #node-input-netId, #node-input-fbName, #node-input-fbInst, #node-input-fbPin, #node-input-list").on("input change", update);
+                update();
+            },
+        };
+    })();
+</script>
+
+<!-- ===================== Steuerung (Konfiguration) ===================== -->
+<script type="text/javascript">
+    RED.nodes.registerType("easye4json-device", {
+        category: "config",
+        defaults: {
+            name: { value: "" },
+            host: { value: "", required: true },
+            protocol: { value: "http" },
+            port: { value: "", validate: function (v) { return v === "" || v === undefined || (/^\d+$/.test(String(v)) && +v > 0 && +v < 65536); } },
+            verifyCert: { value: false },
+            auth: { value: "basic" },
+            readPath: { value: "auto" },
+            timeout: { value: 3000, validate: RED.validators.number() },
+            gap: { value: 50, validate: function (v) { return v === undefined || v === "" || (/^\d+$/.test(String(v)) && +v <= 5000); } },
+        },
+        credentials: {
+            user: { type: "text" },
+            password: { type: "password" },
+            apikey: { type: "password" },
+        },
+        label: function () {
+            return this.name || ("easyE4 " + (this.host || "JSON"));
+        },
+        paletteLabel: "easyE4 JSON",
+        oneditprepare: function () {
+            var node = this;
+            function update() {
+                var a = $("#node-config-input-auth").val();
+                $(".e4j-basic").toggle(a === "basic");
+                $(".e4j-bearer").toggle(a === "bearer");
+                $(".e4j-https").toggle($("#node-config-input-protocol").val() === "https");
+                $("#node-config-input-port").attr("placeholder", $("#node-config-input-protocol").val() === "https" ? "443" : "80");
+            }
+            $("#node-config-input-auth, #node-config-input-protocol").on("change", update);
+            update();
+
+            $("#e4j-test").on("click", function (ev) {
+                ev.preventDefault();
+                var $r = $("#e4j-test-result");
+                $r.css("color", "").text(node._("easye4json.test.running"));
+                var body = {
+                    id: node.id,
+                    host: $("#node-config-input-host").val(),
+                    protocol: $("#node-config-input-protocol").val(),
+                    port: $("#node-config-input-port").val(),
+                    verifyCert: $("#node-config-input-verifyCert").is(":checked"),
+                    auth: $("#node-config-input-auth").val(),
+                    readPath: $("#node-config-input-readPath").val(),
+                    timeout: $("#node-config-input-timeout").val(),
+                    user: $("#node-config-input-user").val(),
+                    password: $("#node-config-input-password").val(),
+                    apikey: $("#node-config-input-apikey").val(),
+                    gap: $("#node-config-input-gap").val(),
+                    lang: RED.i18n.lang(),
+                };
+                $.ajax({
+                    url: "easye4json/test",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(body),
+                    success: function (res) {
+                        $r.css("color", res.ok ? "#3a3" : "#c33").text(res.text);
+                    },
+                    error: function (xhr) {
+                        $r.css("color", "#c33").text(node._("easye4json.test.failed") + ": " + (xhr.responseText || xhr.status));
+                    },
+                });
+            });
+        },
+    });
+</script>
+
+<script type="text/html" data-template-name="easye4json-device">
+    <div class="form-row">
+        <label for="node-config-input-name"><i class="fa fa-tag"></i> <span data-i18n="node-red:common.label.name"></span></label>
+        <input type="text" id="node-config-input-name" placeholder="easyE4" />
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-host"><i class="fa fa-globe"></i> <span data-i18n="easye4json.label.host"></span></label>
+        <input type="text" id="node-config-input-host" data-i18n="[placeholder]easye4json.placeholder.host" />
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-protocol"><i class="fa fa-exchange"></i> <span data-i18n="easye4json.label.protocol"></span></label>
+        <select id="node-config-input-protocol" style="width:100px">
+            <option value="http">http</option>
+            <option value="https">https</option>
+        </select>
+        <span style="margin-left:12px" data-i18n="easye4json.label.port"></span>
+        <input type="text" id="node-config-input-port" style="width:70px; margin-left:6px" placeholder="80" />
+    </div>
+    <div class="form-row e4j-https">
+        <label>&nbsp;</label>
+        <input type="checkbox" id="node-config-input-verifyCert" style="display:inline-block; width:auto; vertical-align:top;" />
+        <label for="node-config-input-verifyCert" style="width:auto"> <span data-i18n="easye4json.label.verifyCert"></span></label>
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-auth"><i class="fa fa-lock"></i> <span data-i18n="easye4json.label.auth"></span></label>
+        <select id="node-config-input-auth">
+            <option value="basic" data-i18n="easye4json.auth.basic"></option>
+            <option value="bearer" data-i18n="easye4json.auth.bearer"></option>
+            <option value="none" data-i18n="easye4json.auth.none"></option>
+        </select>
+    </div>
+    <div class="form-row e4j-basic">
+        <label for="node-config-input-user"><i class="fa fa-user"></i> <span data-i18n="easye4json.label.user"></span></label>
+        <input type="text" id="node-config-input-user" placeholder="admin" autocomplete="off" />
+    </div>
+    <div class="form-row e4j-basic">
+        <label for="node-config-input-password"><i class="fa fa-key"></i> <span data-i18n="easye4json.label.password"></span></label>
+        <input type="password" id="node-config-input-password" autocomplete="new-password" />
+    </div>
+    <div class="form-row e4j-bearer">
+        <label for="node-config-input-apikey"><i class="fa fa-key"></i> <span data-i18n="easye4json.label.apikey"></span></label>
+        <input type="password" id="node-config-input-apikey" autocomplete="new-password" />
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-readPath"><i class="fa fa-road"></i> <span data-i18n="easye4json.label.readPath"></span></label>
+        <select id="node-config-input-readPath" style="width:70%">
+            <option value="auto" data-i18n="easye4json.readPath.auto"></option>
+            <option value="data" data-i18n="easye4json.readPath.data"></option>
+            <option value="adm" data-i18n="easye4json.readPath.adm"></option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-timeout"><i class="fa fa-clock-o"></i> <span data-i18n="easye4json.label.timeout"></span></label>
+        <input type="text" id="node-config-input-timeout" style="width:80px" /> ms
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-gap"><i class="fa fa-pause"></i> <span data-i18n="easye4json.label.gap"></span></label>
+        <input type="text" id="node-config-input-gap" style="width:80px" placeholder="50" /> ms
+        <span style="margin-left:6px; color:#888" data-i18n="easye4json.label.gapHint"></span>
+    </div>
+    <div class="form-row">
+        <label>&nbsp;</label>
+        <button type="button" class="red-ui-button" id="e4j-test"><i class="fa fa-plug"></i> <span data-i18n="easye4json.test.button"></span></button>
+    </div>
+    <div class="form-row">
+        <label>&nbsp;</label>
+        <span id="e4j-test-result" style="display:inline-block; width:65%"></span>
+    </div>
+    <div class="form-tips" data-i18n="[html]easye4json.tips.device"></div>
+</script>
+
+
+<!-- ===================== easyE4 JSON lesen ===================== -->
+<script type="text/javascript">
+    RED.nodes.registerType("easye4json-read", {
+        category: "easyE4",
+        color: "#a6bbcf",
+        defaults: {
+            name: { value: "" },
+            device: { type: "easye4json-device", required: true },
+            mode: { value: "operand" },
+            opType: { value: "M" },
+            netId: { value: 0, validate: easyE4Json.vNet },
+            index: { value: 1, validate: easyE4Json.vIndex },
+            rangeEnd: { value: 8, validate: easyE4Json.vRangeEnd },
+            allType: { value: "I" },
+            sys: { value: "STATE" },
+            fbName: { value: "T", validate: easyE4Json.vFbName },
+            fbInst: { value: 1, validate: easyE4Json.vFbInst },
+            fbPinType: { value: "1" },
+            fbPin: { value: 0, validate: easyE4Json.vFbPin },
+            list: { value: "", validate: easyE4Json.vList },
+            interval: { value: 1, validate: function (v) { var s = String(v === undefined ? "" : v).trim().replace(",", "."); return /^\d+(\.\d+)?$/.test(s) && (+s === 0 || +s >= 0.5); } },
+            onlyChange: { value: false },
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "font-awesome/fa-sign-in",
+        label: function () {
+            if (this.name) return this.name;
+            if (this.mode === "msg") return this._("easye4json.read.label");
+            return this._("easye4json.read.label") + ": " + easyE4Json.shortLabel(this);
+        },
+        paletteLabel: function () { return this._("easye4json.read.paletteLabel"); },
+        inputLabels: function () { return this._("easye4json.read.input"); },
+        outputLabels: function () { return this._("easye4json.read.output"); },
+        oneditprepare: function () { easyE4Json.bind(this, false); },
+    });
+</script>
+
+<script type="text/html" data-template-name="easye4json-read">
+    <div class="form-row">
+        <label for="node-input-device"><i class="fa fa-microchip"></i> <span data-i18n="easye4json.label.device"></span></label>
+        <input type="text" id="node-input-device" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-mode"><i class="fa fa-list"></i> <span data-i18n="easye4json.label.mode"></span></label>
+        <select id="node-input-mode" style="width:70%">
+            <option value="operand" data-i18n="easye4json.mode.operand"></option>
+            <option value="range" data-i18n="easye4json.mode.range"></option>
+            <option value="all" data-i18n="easye4json.mode.all"></option>
+            <option value="sys" data-i18n="easye4json.mode.sys"></option>
+            <option value="fb" data-i18n="easye4json.mode.fb"></option>
+            <option value="list" data-i18n="easye4json.mode.list"></option>
+            <option value="msg" data-i18n="easye4json.mode.msg"></option>
+        </select>
+    </div>
+    <div class="form-row e4j-op">
+        <label for="node-input-opType"><i class="fa fa-crosshairs"></i> <span data-i18n="easye4json.label.operand"></span></label>
+        <select id="node-input-opType" style="width:70%">
+            <option value="I" data-i18n="easye4json.op.I"></option>
+            <option value="Q" data-i18n="easye4json.op.Q"></option>
+            <option value="AI" data-i18n="easye4json.op.AI"></option>
+            <option value="AO" data-i18n="easye4json.op.AO"></option>
+            <option value="ID" data-i18n="easye4json.op.ID"></option>
+            <option value="M" data-i18n="easye4json.op.M"></option>
+            <option value="MB" data-i18n="easye4json.op.MB"></option>
+            <option value="MW" data-i18n="easye4json.op.MW"></option>
+            <option value="MD" data-i18n="easye4json.op.MD"></option>
+            <option value="N" data-i18n="easye4json.op.N"></option>
+            <option value="NB" data-i18n="easye4json.op.NB"></option>
+            <option value="NW" data-i18n="easye4json.op.NW"></option>
+            <option value="ND" data-i18n="easye4json.op.ND"></option>
+        </select>
+    </div>
+    <div class="form-row e4j-op e4j-net">
+        <label for="node-input-netId"><i class="fa fa-sitemap"></i> <span data-i18n="easye4json.label.netId"></span></label>
+        <input type="number" id="node-input-netId" min="0" max="8" step="1" style="width:70px" />
+    </div>
+    <div class="form-row e4j-op">
+        <label for="node-input-index"><i class="fa fa-hashtag"></i> <span data-i18n="easye4json.label.index"></span></label>
+        <input type="number" id="node-input-index" min="1" step="1" style="width:80px" />
+        <span class="e4j-end" style="margin:0 6px" data-i18n="easye4json.label.rangeEnd"></span>
+        <input class="e4j-end" type="number" id="node-input-rangeEnd" min="1" step="1" style="width:80px" />
+    </div>
+    <div class="form-row e4j-all">
+        <label for="node-input-allType"><i class="fa fa-crosshairs"></i> <span data-i18n="easye4json.label.allType"></span></label>
+        <select id="node-input-allType" style="width:70%">
+            <option value="I" data-i18n="easye4json.op.I"></option>
+            <option value="Q" data-i18n="easye4json.op.Q"></option>
+            <option value="AI" data-i18n="easye4json.op.AI"></option>
+            <option value="AO" data-i18n="easye4json.op.AO"></option>
+            <option value="M" data-i18n="easye4json.op.M"></option>
+        </select>
+    </div>
+    <div class="form-row e4j-sys">
+        <label for="node-input-sys"><i class="fa fa-info-circle"></i> <span data-i18n="easye4json.label.sys"></span></label>
+        <select id="node-input-sys" style="width:70%">
+            <option value="STATE" data-i18n="easye4json.sys.STATE"></option>
+            <option value="VERSION" data-i18n="easye4json.sys.VERSION"></option>
+            <option value="DEVNAME" data-i18n="easye4json.sys.DEVNAME"></option>
+            <option value="PROGNAME" data-i18n="easye4json.sys.PROGNAME"></option>
+            <option value="DATE" data-i18n="easye4json.sys.DATE"></option>
+            <option value="TIME" data-i18n="easye4json.sys.TIME"></option>
+            <option value="CYC" data-i18n="easye4json.sys.CYC"></option>
+            <option value="DIAG" data-i18n="easye4json.sys.DIAG"></option>
+            <option value="EXTSTATE" data-i18n="easye4json.sys.EXTSTATE"></option>
+            <option value="IPSET" data-i18n="easye4json.sys.IPSET"></option>
+            <option value="DEVID" data-i18n="easye4json.sys.DEVID"></option>
+            <option value="DEVLANG" data-i18n="easye4json.sys.DEVLANG"></option>
+            <option value="DEVLOCATION" data-i18n="easye4json.sys.DEVLOCATION"></option>
+            <option value="EMAIL" data-i18n="easye4json.sys.EMAIL"></option>
+            <option value="EMAILGROUPS" data-i18n="easye4json.sys.EMAILGROUPS"></option>
+        </select>
+    </div>
+    <div class="form-row e4j-fb">
+        <label for="node-input-fbName"><i class="fa fa-cube"></i> <span data-i18n="easye4json.label.fbName"></span></label>
+        <input type="text" id="node-input-fbName" style="width:60px" data-i18n="[placeholder]easye4json.placeholder.fbName" />
+        <span style="margin:0 6px" data-i18n="easye4json.label.fbInst"></span>
+        <input type="number" id="node-input-fbInst" min="1" step="1" style="width:70px" />
+    </div>
+    <div class="form-row e4j-fb">
+        <label for="node-input-fbPinType"><i class="fa fa-plug"></i> <span data-i18n="easye4json.label.fbPinType"></span></label>
+        <select id="node-input-fbPinType" style="width:38%">
+            <option value="0" data-i18n="easye4json.pinType.0"></option>
+            <option value="1" data-i18n="easye4json.pinType.1"></option>
+            <option value="2" data-i18n="easye4json.pinType.2"></option>
+            <option value="3" data-i18n="easye4json.pinType.3"></option>
+        </select>
+        <span style="margin:0 4px" data-i18n="easye4json.label.fbPin"></span>
+        <input type="number" id="node-input-fbPin" min="0" step="1" style="width:55px" />
+    </div>
+    <div class="form-row e4j-list">
+        <label for="node-input-list"><i class="fa fa-list-ul"></i> <span data-i18n="easye4json.label.list"></span></label>
+        <textarea id="node-input-list" rows="3" style="width:70%" data-i18n="[placeholder]easye4json.placeholder.list"></textarea>
+    </div>
+    <div class="form-row">
+        <label><i class="fa fa-eye"></i> <span data-i18n="easye4json.label.element"></span></label>
+        <code id="e4j-preview"></code>
+    </div>
+    <div class="form-row e4j-poll">
+        <label for="node-input-interval"><i class="fa fa-repeat"></i> <span data-i18n="easye4json.label.interval"></span></label>
+        <input type="text" id="node-input-interval" style="width:60px" />
+        <span style="margin-left:6px" data-i18n="easye4json.label.seconds"></span>
+    </div>
+    <div class="form-row">
+        <label>&nbsp;</label>
+        <input type="checkbox" id="node-input-onlyChange" style="display:inline-block; width:auto; vertical-align:top;" />
+        <label for="node-input-onlyChange" style="width:auto"> <span data-i18n="easye4json.label.onlyChange"></span></label>
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="node-red:common.label.name"></span></label>
+        <input type="text" id="node-input-name" data-i18n="[placeholder]node-red:common.label.name" />
+    </div>
+    <div class="form-tips" data-i18n="[html]easye4json.tips.read"></div>
+</script>
+
+
+<!-- ===================== easyE4 JSON schreiben ===================== -->
+<script type="text/javascript">
+    RED.nodes.registerType("easye4json-write", {
+        category: "easyE4",
+        color: "#a6bbcf",
+        align: "right",
+        defaults: {
+            name: { value: "" },
+            device: { type: "easye4json-device", required: true },
+            mode: { value: "operand" },
+            opType: { value: "M" },
+            netId: { value: 0, validate: easyE4Json.vNet },
+            index: { value: 1, validate: easyE4Json.vIndex },
+            fbName: { value: "T", validate: easyE4Json.vFbName },
+            fbInst: { value: 1, validate: easyE4Json.vFbInst },
+            fbPinType: { value: "2" },
+            fbPin: { value: 0, validate: easyE4Json.vFbPin },
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "font-awesome/fa-sign-out",
+        label: function () {
+            if (this.name) return this.name;
+            if (this.mode === "msg") return this._("easye4json.write.label");
+            return this._("easye4json.write.label") + ": " + easyE4Json.shortLabel(this);
+        },
+        paletteLabel: function () { return this._("easye4json.write.paletteLabel"); },
+        inputLabels: function () { return this._("easye4json.write.input"); },
+        outputLabels: function () { return this._("easye4json.write.output"); },
+        oneditprepare: function () { easyE4Json.bind(this, true); },
+    });
+</script>
+
+<script type="text/html" data-template-name="easye4json-write">
+    <div class="form-row">
+        <label for="node-input-device"><i class="fa fa-microchip"></i> <span data-i18n="easye4json.label.device"></span></label>
+        <input type="text" id="node-input-device" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-mode"><i class="fa fa-list"></i> <span data-i18n="easye4json.label.writeMode"></span></label>
+        <select id="node-input-mode" style="width:70%">
+            <option value="operand" data-i18n="easye4json.writeMode.operand"></option>
+            <option value="fb" data-i18n="easye4json.writeMode.fb"></option>
+            <option value="msg" data-i18n="easye4json.writeMode.msg"></option>
+        </select>
+    </div>
+    <div class="form-row e4j-op">
+        <label for="node-input-opType"><i class="fa fa-crosshairs"></i> <span data-i18n="easye4json.label.operand"></span></label>
+        <select id="node-input-opType" style="width:70%">
+            <option value="M" data-i18n="easye4json.op.M"></option>
+            <option value="MB" data-i18n="easye4json.op.MB"></option>
+            <option value="MW" data-i18n="easye4json.op.MW"></option>
+            <option value="MD" data-i18n="easye4json.op.MD"></option>
+            <option value="N" data-i18n="easye4json.op.N"></option>
+            <option value="NB" data-i18n="easye4json.op.NB"></option>
+            <option value="NW" data-i18n="easye4json.op.NW"></option>
+            <option value="ND" data-i18n="easye4json.op.ND"></option>
+        </select>
+    </div>
+    <div class="form-row e4j-op e4j-net">
+        <label for="node-input-netId"><i class="fa fa-sitemap"></i> <span data-i18n="easye4json.label.netId"></span></label>
+        <input type="number" id="node-input-netId" min="0" max="8" step="1" style="width:70px" />
+    </div>
+    <div class="form-row e4j-op">
+        <label for="node-input-index"><i class="fa fa-hashtag"></i> <span data-i18n="easye4json.label.index"></span></label>
+        <input type="number" id="node-input-index" min="1" step="1" style="width:80px" />
+    </div>
+    <div class="form-row e4j-fb">
+        <label for="node-input-fbName"><i class="fa fa-cube"></i> <span data-i18n="easye4json.label.fbName"></span></label>
+        <input type="text" id="node-input-fbName" style="width:60px" data-i18n="[placeholder]easye4json.placeholder.fbName" />
+        <span style="margin:0 6px" data-i18n="easye4json.label.fbInst"></span>
+        <input type="number" id="node-input-fbInst" min="1" step="1" style="width:70px" />
+    </div>
+    <div class="form-row e4j-fb">
+        <label for="node-input-fbPinType"><i class="fa fa-plug"></i> <span data-i18n="easye4json.label.fbPinType"></span></label>
+        <select id="node-input-fbPinType" style="width:38%">
+            <option value="0" data-i18n="easye4json.pinType.0"></option>
+            <option value="2" data-i18n="easye4json.pinType.2"></option>
+        </select>
+        <span style="margin:0 4px" data-i18n="easye4json.label.fbPin"></span>
+        <input type="number" id="node-input-fbPin" min="0" step="1" style="width:55px" />
+    </div>
+    <div class="form-row">
+        <label><i class="fa fa-eye"></i> <span data-i18n="easye4json.label.element"></span></label>
+        <code id="e4j-preview"></code>
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="node-red:common.label.name"></span></label>
+        <input type="text" id="node-input-name" data-i18n="[placeholder]node-red:common.label.name" />
+    </div>
+    <div class="form-tips" data-i18n="[html]easye4json.tips.write"></div>
+    <div class="form-tips e4j-fbtip" style="margin-top:6px" data-i18n="[html]easye4json.tips.fbWrite"></div>
+</script>
+
+
+<!-- ===================== easyE4 JSON aktion ===================== -->
+<script type="text/javascript">
+    (function () {
+        var ACTIONS = ["msg", "run", "stop", "setClock", "setDate", "setTime", "setName", "saveFB", "request"];
+        RED.nodes.registerType("easye4json-action", {
+            category: "easyE4",
+            color: "#a6bbcf",
+            defaults: {
+                name: { value: "" },
+                device: { type: "easye4json-device", required: true },
+                action: { value: "stop" },
+                devName: { value: "" },
+            },
+            inputs: 1,
+            outputs: 1,
+            icon: "font-awesome/fa-bolt",
+            label: function () {
+                var l = ACTIONS.indexOf(this.action) >= 0 ? this._("easye4json.action.label." + this.action) : this.action;
+                return this.name || "easyE4: " + l;
+            },
+            paletteLabel: function () { return this._("easye4json.action.paletteLabel"); },
+            inputLabels: function () { return this._("easye4json.action.input"); },
+            outputLabels: function () { return this._("easye4json.action.output"); },
+            oneditprepare: function () {
+                var node = this;
+                function update() {
+                    var a = $("#node-input-action").val();
+                    $(".e4j-name-row").toggle(a === "setName");
+                    $("#e4j-action-tip").html(ACTIONS.indexOf(a) >= 0 ? node._("easye4json.action.tip." + a) : "");
+                }
+                $("#node-input-action").on("change", update);
+                update();
+            },
+        });
+    })();
+</script>
+
+<script type="text/html" data-template-name="easye4json-action">
+    <div class="form-row">
+        <label for="node-input-device"><i class="fa fa-microchip"></i> <span data-i18n="easye4json.label.device"></span></label>
+        <input type="text" id="node-input-device" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-action"><i class="fa fa-bolt"></i> <span data-i18n="easye4json.label.action"></span></label>
+        <select id="node-input-action" style="width:70%">
+            <option value="run" data-i18n="easye4json.action.opt.run"></option>
+            <option value="stop" data-i18n="easye4json.action.opt.stop"></option>
+            <option value="setClock" data-i18n="easye4json.action.opt.setClock"></option>
+            <option value="setDate" data-i18n="easye4json.action.opt.setDate"></option>
+            <option value="setTime" data-i18n="easye4json.action.opt.setTime"></option>
+            <option value="setName" data-i18n="easye4json.action.opt.setName"></option>
+            <option value="saveFB" data-i18n="easye4json.action.opt.saveFB"></option>
+            <option value="request" data-i18n="easye4json.action.opt.request"></option>
+            <option value="msg" data-i18n="easye4json.action.opt.msg"></option>
+        </select>
+    </div>
+    <div class="form-row e4j-name-row">
+        <label for="node-input-devName"><i class="fa fa-pencil"></i> <span data-i18n="easye4json.label.devName"></span></label>
+        <input type="text" id="node-input-devName" placeholder="easyE4_2" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="node-red:common.label.name"></span></label>
+        <input type="text" id="node-input-name" data-i18n="[placeholder]node-red:common.label.name" />
+    </div>
+    <div class="form-tips" id="e4j-action-tip"></div>
+</script>
